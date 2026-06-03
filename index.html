@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -2719,7 +2719,7 @@ function updateProductInventory() {
     var ov = _prodOv.hasOwnProperty(prod) ? _prodOv[prod] : null;
     var dispKg = ov !== null ? ov : s.kg;
     var kgPerPallet = palletSettings[prod] || 120;
-    var pallets = kgPerPallet > 0 ? Math.floor(dispKg / kgPerPallet) : 0;
+    var pallets = kgPerPallet > 0 ? Math.round((dispKg / kgPerPallet) * 10) / 10 : 0;
     totalPallets += pallets;
     var safeP = prod.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     var kgCell = ov !== null
@@ -2743,7 +2743,7 @@ function updateProductInventory() {
   var _ms = JSON.parse(localStorage.getItem('matzah_manual_stock') || '[]');
   var manualRows = _ms.map(function(e) {
     var kgPerPallet = palletSettings[e.name] || 120;
-    var pallets = kgPerPallet > 0 ? Math.floor(e.kg / kgPerPallet) : 0;
+    var pallets = kgPerPallet > 0 ? Math.round((e.kg / kgPerPallet) * 10) / 10 : 0;
     totalPallets += pallets;
     return '<tr style="background:rgba(167,139,250,0.04);">'
       + '<td style="color:#a78bfa;font-weight:700;">' + e.name + ' <span style="background:rgba(167,139,250,0.2);border:1px solid rgba(167,139,250,0.4);color:#a78bfa;border-radius:8px;padding:1px 6px;font-size:9px;font-weight:700;vertical-align:middle;">ידני</span></td>'
@@ -2832,7 +2832,7 @@ function updateProductInventory() {
     : entries.map(function(prod) {
         var s = stock[prod];
         var kgPerPallet = palletSettings[prod] || 120;
-        var pallets = kgPerPallet > 0 ? Math.floor(s.kg / kgPerPallet) : 0;
+        var pallets = kgPerPallet > 0 ? Math.round((s.kg / kgPerPallet) * 10) / 10 : 0;
         return '<tr>'
           + '<td style="color:#f0b429;font-weight:700;">' + prod + '</td>'
           + '<td style="color:#22c55e;font-weight:800;font-size:16px;">' + s.kg + ' <span style="font-size:11px;font-weight:400;">ק"ג</span></td>'

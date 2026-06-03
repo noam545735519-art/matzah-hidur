@@ -963,24 +963,79 @@
     <!-- היסטוריית תפוקה -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
       <div class="card">
-        <div class="card-title"><span class="icon">📅</span> תפוקה יומית</div>
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span><span class="icon">📅</span> תפוקה יומית</span>
+          <button onclick="toggleManualDailyForm()" style="background:rgba(240,180,41,0.15);border:1px solid rgba(240,180,41,0.4);color:#f0b429;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">+ הוסף ידני</button>
+        </div>
+        <div id="manual-daily-form" style="display:none;background:#0f1923;border:1px solid rgba(240,180,41,0.2);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end;">
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">תאריך (DD/MM)</div>
+              <input id="mdaily-date" type="text" placeholder="04/07" maxlength="5" style="width:100%;background:#1a2535;border:1px solid #2a3a50;border-radius:8px;padding:6px 8px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;direction:ltr;">
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">מוצר</div>
+              <input id="mdaily-prod" type="text" placeholder="אפיקומן" style="width:100%;background:#1a2535;border:1px solid #2a3a50;border-radius:8px;padding:6px 8px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;direction:rtl;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">ק"ג</div>
+              <input id="mdaily-kg" type="number" min="0" placeholder="0" style="width:100%;background:#1a2535;border:1px solid rgba(240,180,41,0.4);border-radius:8px;padding:6px 8px;color:#f0b429;font-family:Heebo,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;">
+            </div>
+            <button onclick="addManualDailyRow()" style="background:linear-gradient(135deg,#f0b429,#d97706);color:#0a1628;border:none;border-radius:8px;padding:6px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;white-space:nowrap;">✓ הוסף</button>
+          </div>
+        </div>
         <table>
-          <thead><tr><th>תאריך</th><th>מוצרים</th><th>סה"כ ק"ג</th><th>משמרות</th></tr></thead>
+          <thead><tr><th>תאריך</th><th>מוצרים</th><th>סה"כ ק"ג</th><th>משמרות</th><th></th></tr></thead>
           <tbody id="prod-daily-tbody">
             <tr><td colspan="4" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>
           </tbody>
         </table>
       </div>
       <div class="card">
-        <div class="card-title"><span class="icon">📆</span> תפוקה שבועית</div>
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span><span class="icon">📆</span> תפוקה שבועית</span>
+          <button onclick="toggleManualWeeklyForm()" style="background:rgba(240,180,41,0.15);border:1px solid rgba(240,180,41,0.4);color:#f0b429;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">+ הוסף ידני</button>
+        </div>
+        <div id="manual-weekly-form" style="display:none;background:#0f1923;border:1px solid rgba(240,180,41,0.2);border-radius:10px;padding:12px;margin-bottom:10px;">
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr auto;gap:8px;align-items:end;">
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">שבוע (DD/MM — DD/MM)</div>
+              <input id="mweekly-week" type="text" placeholder="29/06 — 05/07" style="width:100%;background:#1a2535;border:1px solid #2a3a50;border-radius:8px;padding:6px 8px;color:white;font-family:Heebo,Arial,sans-serif;font-size:12px;outline:none;box-sizing:border-box;direction:ltr;">
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">מוצר</div>
+              <input id="mweekly-prod" type="text" placeholder="אפיקומן" style="width:100%;background:#1a2535;border:1px solid #2a3a50;border-radius:8px;padding:6px 8px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;direction:rtl;outline:none;box-sizing:border-box;">
+            </div>
+            <div>
+              <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;font-family:Heebo,Arial,sans-serif;">ק"ג</div>
+              <input id="mweekly-kg" type="number" min="0" placeholder="0" style="width:100%;background:#1a2535;border:1px solid rgba(240,180,41,0.4);border-radius:8px;padding:6px 8px;color:#f0b429;font-family:Heebo,Arial,sans-serif;font-size:13px;outline:none;box-sizing:border-box;">
+            </div>
+            <button onclick="addManualWeeklyRow()" style="background:linear-gradient(135deg,#f0b429,#d97706);color:#0a1628;border:none;border-radius:8px;padding:6px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;white-space:nowrap;">✓ הוסף</button>
+          </div>
+        </div>
         <table>
-          <thead><tr><th>שבוע</th><th>מוצרים</th><th>סה"כ ק"ג</th><th>משמרות</th></tr></thead>
+          <thead><tr><th>שבוע</th><th>מוצרים</th><th>סה"כ ק"ג</th><th>משמרות</th><th></th></tr></thead>
           <tbody id="prod-weekly-tbody">
             <tr><td colspan="4" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- מעקב משטחים -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span><span class="icon">📦</span> מעקב משטחים — ממוספרים אוטומטי</span>
+        <div style="display:flex;gap:8px;">
+          <span id="pallet-season-label" style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;align-self:center;"></span>
+          <button onclick="viewSeasonsArchive()" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35);color:#818cf8;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">📚 ארכיון עונות</button>
+          <button onclick="resetPalletSeason()" style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.35);color:#f87171;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">🔄 אפס עונה</button>
+        </div>
+      </div>
+      <div id="pallet-tracker-body" style="margin-top:8px;"></div>
+      <div id="seasons-archive-panel" style="display:none;margin-top:12px;border-top:1px solid rgba(99,102,241,0.2);padding-top:12px;"></div>
+    </div>
+
   </div>
 
   <!-- ===== TAB 4: מלאי ===== -->
@@ -2405,6 +2460,7 @@ function loadData() {
   syncDashboard();
   updateShiftTotals();
   buildProductionHistory();
+  buildPalletTracker();
   updateProductInventory();
   migrateOrderRows();
   migrateProdRows();
@@ -2649,46 +2705,382 @@ function buildProductionHistory() {
     return new Date(yr, parseInt(p[1])-1, parseInt(p[0])).getTime();
   };
 
+  // overrides
+  var _dOv = JSON.parse(localStorage.getItem('matzah_daily_ov') || '{}');
+  var _wOv = JSON.parse(localStorage.getItem('matzah_weekly_ov') || '{}');
+
   // render daily table
   var dTbody = document.getElementById('prod-daily-tbody');
   var dKeys = Object.keys(daily).sort(function(a, b) { return toTime(b) - toTime(a); });
-  if (dKeys.length === 0) {
-    dTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>';
+  var _manualDailyRows  = JSON.parse(localStorage.getItem('matzah_manual_daily_rows')  || '[]');
+  var _manualWeeklyRows = JSON.parse(localStorage.getItem('matzah_manual_weekly_rows') || '[]');
+
+  if (dKeys.length === 0 && _manualDailyRows.length === 0) {
+    dTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>';
   } else {
+    var manualDailyHtml = _manualDailyRows.map(function(r) {
+      return '<tr style="background:rgba(167,139,250,0.05);">'
+        +'<td style="color:#a78bfa;font-weight:600;">'+r.date+' <span style="font-size:9px;background:rgba(167,139,250,0.2);border-radius:4px;padding:1px 5px;">ידני</span></td>'
+        +'<td style="color:#a78bfa;font-size:12px;">'+( r.prod || '—')+'</td>'
+        +'<td style="color:#f0b429;font-weight:700;">'+r.kg+' ק"ג</td>'
+        +'<td style="color:#94a3b8;">—</td>'
+        +'<td><button onclick="deleteManualDailyRow('+r.id+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:12px;padding:0;" title="מחק">✕</button></td>'
+        +'</tr>';
+    }).join('');
     dTbody.innerHTML = dKeys.map(function(k) {
       var isToday = (k === todayKey);
       var style = isToday ? 'background:rgba(240,180,41,0.08);' : '';
       var prodsArr = daily[k].products || [];
       var prodsHtml = prodsArr.length > 0 ? prodsArr.join('<br>') : '—';
+      var dispKg = _dOv.hasOwnProperty(k) ? _dOv[k] : daily[k].kg;
+      var ovMark = _dOv.hasOwnProperty(k) ? ' <span style="font-size:9px;color:#60a5fa;background:rgba(96,165,250,0.15);border-radius:4px;padding:1px 5px;">ידני</span>' : '';
+      var safeK = k.replace(/'/g,"\\'");
       var tr = document.createElement('tr');
       tr.style.cssText = style;
       tr.innerHTML = '<td style="color:'+(isToday?'#f0b429':'#cbd5e1')+';font-weight:'+(isToday?'700':'400')+';">'+k+(isToday?' ✦':'')+'</td>'
         +'<td style="color:#a78bfa;font-size:12px;line-height:1.6;">'+prodsHtml+'</td>'
-        +'<td style="color:#f0b429;font-weight:700;">'+daily[k].kg+' ק"ג</td>'
-        +'<td style="color:#94a3b8;">'+daily[k].shifts+'</td>';
+        +'<td id="dkg-'+k+'" style="color:#f0b429;font-weight:700;">'+dispKg+' ק"ג'+ovMark+'</td>'
+        +'<td style="color:#94a3b8;">'+daily[k].shifts+'</td>'
+        +'<td><button onclick="editDailyRow(\''+safeK+'\')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#94a3b8;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;" title="עריכה ידנית">✏️</button></td>';
       return tr.outerHTML;
-    }).join('');
+    }).join('') + manualDailyHtml;
   }
 
   // render weekly table
   var wTbody = document.getElementById('prod-weekly-tbody');
   var wKeys = Object.keys(weekly).sort(function(a, b) { return weekly[b].time - weekly[a].time; });
-  if (wKeys.length === 0) {
-    wTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>';
+  if (wKeys.length === 0 && _manualWeeklyRows.length === 0) {
+    wTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#475569;padding:20px;">אין נתונים</td></tr>';
   } else {
+    var manualWeeklyHtml = _manualWeeklyRows.map(function(r) {
+      return '<tr style="background:rgba(167,139,250,0.05);">'
+        +'<td style="color:#a78bfa;font-size:12px;font-weight:600;">'+r.week+' <span style="font-size:9px;background:rgba(167,139,250,0.2);border-radius:4px;padding:1px 5px;">ידני</span></td>'
+        +'<td style="color:#a78bfa;font-size:12px;">'+( r.prod || '—')+'</td>'
+        +'<td style="color:#f0b429;font-weight:700;">'+r.kg+' ק"ג</td>'
+        +'<td style="color:#94a3b8;">—</td>'
+        +'<td><button onclick="deleteManualWeeklyRow('+r.id+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:12px;padding:0;" title="מחק">✕</button></td>'
+        +'</tr>';
+    }).join('');
     wTbody.innerHTML = wKeys.map(function(k) {
       var isCur = (k === curWeekKey);
       var style = isCur ? 'background:rgba(240,180,41,0.08);' : '';
       var prodsHtml = (weekly[k].products && weekly[k].products.length > 0) ? weekly[k].products.join('<br>') : '—';
+      var dispKg = _wOv.hasOwnProperty(k) ? _wOv[k] : weekly[k].kg;
+      var ovMark = _wOv.hasOwnProperty(k) ? ' <span style="font-size:9px;color:#60a5fa;background:rgba(96,165,250,0.15);border-radius:4px;padding:1px 5px;">ידני</span>' : '';
+      var safeK = k.replace(/'/g,"\\'");
       var tr = document.createElement('tr');
       tr.style.cssText = style;
       tr.innerHTML = '<td style="color:'+(isCur?'#f0b429':'#cbd5e1')+';font-size:12px;font-weight:'+(isCur?'700':'400')+';">'+k+(isCur?' ✦':'')+'</td>'
         +'<td style="color:#a78bfa;font-size:12px;line-height:1.6;">'+prodsHtml+'</td>'
-        +'<td style="color:#f0b429;font-weight:700;">'+weekly[k].kg+' ק"ג</td>'
-        +'<td style="color:#94a3b8;">'+weekly[k].shifts+'</td>';
+        +'<td id="wkg-'+k+'" style="color:#f0b429;font-weight:700;">'+dispKg+' ק"ג'+ovMark+'</td>'
+        +'<td style="color:#94a3b8;">'+weekly[k].shifts+'</td>'
+        +'<td><button onclick="editWeeklyRow(\''+safeK+'\')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#94a3b8;border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;" title="עריכה ידנית">✏️</button></td>';
       return tr.outerHTML;
-    }).join('');
+    }).join('') + manualWeeklyHtml;
   }
+}
+
+// ===== מעקב משטחים =====
+var _PALLET_OV_KEY     = 'matzah_pallet_ov';
+var _PALLET_SEASON_KEY = 'matzah_pallet_season';
+
+var _SEASONS_ARCHIVE_KEY = 'matzah_seasons_archive';
+
+function resetPalletSeason() {
+  if (!confirm('שאלה 1 מתוך 2:\nלאפס מספור משטחים לעונה חדשה?\nהמשטחים יתחילו שוב ממשטח #1.')) return;
+  if (!confirm('שאלה 2 מתוך 2:\nאתה בטוח? נתוני העונה הנוכחית יישמרו בארכיון.')) return;
+
+  // שמור עונה נוכחית לארכיון
+  var archive = JSON.parse(localStorage.getItem(_SEASONS_ARCHIVE_KEY) || '[]');
+  var seasonStart = localStorage.getItem(_PALLET_SEASON_KEY) || '—';
+  var seasonEnd   = new Date().toISOString().slice(0,10);
+
+  // אסוף נתוני משטחים נוכחיים
+  var body = document.getElementById('pallet-tracker-body');
+  var rows = body ? body.querySelectorAll('tr') : [];
+  var palletData = [];
+  rows.forEach(function(row) {
+    var cells = row.querySelectorAll('td');
+    if (cells.length < 5) return;
+    palletData.push({
+      num:    cells[0].textContent.trim(),
+      prod:   cells[1].textContent.trim(),
+      kg:     cells[2].textContent.trim(),
+      status: cells[3].textContent.trim(),
+      date:   cells[4].textContent.trim(),
+      note:   cells[5] ? cells[5].textContent.trim() : ''
+    });
+  });
+
+  // חשב סיכום
+  var palletSettings = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
+  var totalKg = 0;
+  palletData.forEach(function(p) { totalKg += parseFloat((p.kg || '').replace(/[^\d.]/g,'')) || 0; });
+
+  archive.push({
+    seasonStart: seasonStart,
+    seasonEnd:   seasonEnd,
+    totalPallets: palletData.length,
+    totalKg:     totalKg,
+    pallets:     palletData
+  });
+
+  localStorage.setItem(_SEASONS_ARCHIVE_KEY, JSON.stringify(archive));
+  localStorage.setItem(_PALLET_SEASON_KEY, new Date().toISOString().slice(0,10));
+  localStorage.removeItem(_PALLET_OV_KEY);
+  buildPalletTracker();
+  alert('✓ העונה נשמרה בארכיון!\nניתן לצפות בה דרך כפתור "ארכיון עונות".');
+}
+
+function viewSeasonsArchive() {
+  var archive = JSON.parse(localStorage.getItem(_SEASONS_ARCHIVE_KEY) || '[]');
+  var panel = document.getElementById('seasons-archive-panel');
+  if (!panel) return;
+  if (panel.style.display !== 'none') { panel.style.display = 'none'; return; }
+
+  if (!archive.length) {
+    panel.innerHTML = '<div style="text-align:center;color:#475569;font-size:13px;font-family:Heebo,Arial,sans-serif;padding:16px;">אין עונות שמורות עדיין</div>';
+    panel.style.display = 'block';
+    return;
+  }
+
+  var html = '';
+  archive.slice().reverse().forEach(function(s, i) {
+    var idx = archive.length - 1 - i;
+    html += '<div style="background:#0f1923;border:1px solid rgba(240,180,41,0.2);border-radius:10px;padding:14px;margin-bottom:10px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">'
+      + '<div style="font-weight:800;color:#f0b429;font-family:Heebo,Arial,sans-serif;font-size:14px;">עונה ' + (idx+1) + ' — ' + (s.seasonStart||'?').split('-').reverse().join('/') + ' עד ' + (s.seasonEnd||'?').split('-').reverse().join('/') + '</div>'
+      + '<div style="display:flex;gap:12px;">'
+      + '<span style="font-size:12px;color:#22c55e;font-family:Heebo,Arial,sans-serif;">📦 ' + s.totalPallets + ' משטחים</span>'
+      + '<span style="font-size:12px;color:#60a5fa;font-family:Heebo,Arial,sans-serif;">⚖️ ' + (s.totalKg||0).toLocaleString() + ' ק"ג</span>'
+      + '</div></div>'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11px;font-family:Heebo,Arial,sans-serif;">'
+      + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08);">'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">#</th>'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">מוצר</th>'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">ק"ג</th>'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">סטטוס</th>'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">תאריך</th>'
+      + '<th style="text-align:right;padding:4px 6px;color:#64748b;">הערה</th>'
+      + '</tr></thead><tbody>';
+    (s.pallets || []).forEach(function(p) {
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+        + '<td style="padding:4px 6px;color:#60a5fa;font-weight:700;">' + p.num + '</td>'
+        + '<td style="padding:4px 6px;color:#f0b429;">' + p.prod + '</td>'
+        + '<td style="padding:4px 6px;color:white;">' + p.kg + '</td>'
+        + '<td style="padding:4px 6px;color:' + (p.status==='מלא'?'#22c55e':'#f0b429') + ';">' + p.status + '</td>'
+        + '<td style="padding:4px 6px;color:#64748b;">' + p.date + '</td>'
+        + '<td style="padding:4px 6px;color:#94a3b8;">' + (p.note||'') + '</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+  panel.innerHTML = html;
+  panel.style.display = 'block';
+}
+
+function editPalletRow(prod, num) {
+  var ovKey = prod + '___' + num;
+  var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+  var cur = ov[ovKey] ? ov[ovKey].note : '';
+  var val = prompt('עריכת משטח #' + num + ' — ' + prod + '\nהזן הערה / מספור ידני (ריק = מחק עריכה):', cur);
+  if (val === null) return;
+  if (val.trim() === '') { delete ov[ovKey]; } else { if (!ov[ovKey]) ov[ovKey] = {}; ov[ovKey].note = val.trim(); }
+  localStorage.setItem(_PALLET_OV_KEY, JSON.stringify(ov));
+  buildPalletTracker();
+}
+
+function buildPalletTracker() {
+  var body = document.getElementById('pallet-tracker-body');
+  if (!body) return;
+
+  var seasonDate = localStorage.getItem(_PALLET_SEASON_KEY) || '';
+  var label = document.getElementById('pallet-season-label');
+  if (label) label.textContent = seasonDate ? 'עונה מ-' + seasonDate.split('-').reverse().join('/') : '';
+
+  var palletSettings = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
+  var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+
+  // אסוף שורות ייצור
+  var rows = Array.from(document.querySelectorAll('#production-tbody tr')).filter(function(r) {
+    return r.cells[0] && r.cells[4] && r.cells[2] &&
+           r.cells[0].textContent.trim().indexOf('/') !== -1;
+  });
+
+  // מיין לפי תאריך
+  var yr = new Date().getFullYear();
+  rows.sort(function(a, b) {
+    var pa = a.cells[0].textContent.trim().split('/');
+    var pb = b.cells[0].textContent.trim().split('/');
+    return new Date(yr, parseInt(pa[1])-1, parseInt(pa[0])).getTime()
+         - new Date(yr, parseInt(pb[1])-1, parseInt(pb[0])).getTime();
+  });
+
+  // עבד לפי מוצר
+  var byProd = {};
+  rows.forEach(function(row) {
+    var date = row.cells[0].textContent.trim();
+    var prod = row.cells[2].textContent.trim();
+    var kg   = parseFloat(row.cells[4].textContent.replace(/[^\d.]/g,'')) || 0;
+    if (!prod || prod === '—' || kg <= 0) return;
+
+    // סנן לפי עונה
+    if (seasonDate) {
+      var parts = date.split('/');
+      var rowTime = new Date(yr, parseInt(parts[1])-1, parseInt(parts[0])).getTime();
+      var seasonTime = new Date(seasonDate).getTime();
+      if (rowTime < seasonTime) return;
+    }
+
+    var kgPer = palletSettings[prod] || 120;
+    if (!byProd[prod]) byProd[prod] = { next: 1, filled: 0, pallets: [] };
+    var state = byProd[prod];
+    var rem = kg;
+
+    while (rem > 0) {
+      var space = kgPer - state.filled;
+      if (rem >= space) {
+        // מלא משטח
+        state.filled = 0;
+        rem -= space;
+        var existing = state.pallets[state.next - 1];
+        if (existing) { existing.filledKg = kgPer; existing.status = 'מלא'; existing.lastDate = date; }
+        else state.pallets.push({ num: state.next, prod: prod, filledKg: kgPer, kgPer: kgPer, status: 'מלא', startDate: date, lastDate: date });
+        state.next++;
+      } else {
+        // חלקי
+        state.filled += rem;
+        rem = 0;
+        var pct = Math.round(state.filled / kgPer * 100);
+        var ex2 = state.pallets[state.next - 1];
+        if (ex2) { ex2.filledKg = state.filled; ex2.status = 'חלקי ' + pct + '%'; ex2.lastDate = date; }
+        else state.pallets.push({ num: state.next, prod: prod, filledKg: state.filled, kgPer: kgPer, status: 'חלקי ' + pct + '%', startDate: date, lastDate: date });
+      }
+    }
+  });
+
+  var allPallets = [];
+  Object.keys(byProd).forEach(function(p) { byProd[p].pallets.forEach(function(pl) { allPallets.push(pl); }); });
+
+  if (!allPallets.length) {
+    body.innerHTML = '<div style="text-align:center;color:#475569;font-size:12px;font-family:Heebo,Arial,sans-serif;padding:16px;">אין נתוני ייצור — הזן משמרות בטאב ייצור</div>';
+    return;
+  }
+
+  var html = '<table style="width:100%;border-collapse:collapse;font-family:Heebo,Arial,sans-serif;font-size:12px;">'
+    + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">#</th>'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">מוצר</th>'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">ק"ג</th>'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">סטטוס</th>'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">תאריך</th>'
+    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">הערה</th>'
+    + '<th style="padding:6px 4px;"></th>'
+    + '</tr></thead><tbody>';
+
+  allPallets.forEach(function(p) {
+    var ovKey = p.prod + '___' + p.num;
+    var note  = ov[ovKey] ? ov[ovKey].note : '';
+    var isFull   = p.status === 'מלא';
+    var statusColor = isFull ? '#22c55e' : '#f0b429';
+    var barW = Math.round(p.filledKg / p.kgPer * 100);
+    var safeP = p.prod.replace(/'/g,"\\'");
+    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
+      + '<td style="padding:7px 8px;color:#60a5fa;font-weight:800;">משטח #' + p.num + '</td>'
+      + '<td style="padding:7px 8px;color:#f0b429;font-weight:600;">' + p.prod + '</td>'
+      + '<td style="padding:7px 8px;">'
+        + '<div style="display:flex;align-items:center;gap:6px;">'
+        + '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:8px;width:60px;overflow:hidden;">'
+        + '<div style="background:'+statusColor+';height:100%;width:'+barW+'%;border-radius:4px;"></div></div>'
+        + '<span style="color:white;font-weight:700;">'+p.filledKg+'<span style="color:#475569;font-size:10px;">/'+p.kgPer+'</span></span>'
+        + '</div></td>'
+      + '<td style="padding:7px 8px;color:'+statusColor+';font-weight:700;">' + p.status + '</td>'
+      + '<td style="padding:7px 8px;color:#64748b;">' + (p.lastDate || '—') + '</td>'
+      + '<td style="padding:7px 8px;color:#94a3b8;font-size:11px;">' + (note || '') + '</td>'
+      + '<td style="padding:7px 4px;"><button data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" class="pallet-edit-btn" style="background:none;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✏️</button></td>'
+      + '</tr>';
+  });
+
+  html += '</tbody></table>';
+  body.innerHTML = html;
+
+  // חיבור כפתורי עריכה דרך event delegation
+  body.querySelectorAll('.pallet-edit-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      editPalletRow(this.getAttribute('data-prod'), parseInt(this.getAttribute('data-num')));
+    });
+  });
+}
+// ===== סוף מעקב משטחים =====
+
+function toggleManualDailyForm() {
+  var f = document.getElementById('manual-daily-form');
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleManualWeeklyForm() {
+  var f = document.getElementById('manual-weekly-form');
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function addManualDailyRow() {
+  var date = (document.getElementById('mdaily-date') || {}).value || '';
+  var prod = (document.getElementById('mdaily-prod') || {}).value || '';
+  var kg   = parseFloat((document.getElementById('mdaily-kg') || {}).value) || 0;
+  if (!date.trim() || kg <= 0) { alert('נא למלא תאריך וק"ג'); return; }
+  var rows = JSON.parse(localStorage.getItem('matzah_manual_daily_rows') || '[]');
+  rows.push({ date: date.trim(), prod: prod.trim(), kg: kg, id: Date.now() });
+  localStorage.setItem('matzah_manual_daily_rows', JSON.stringify(rows));
+  document.getElementById('mdaily-date').value = '';
+  document.getElementById('mdaily-prod').value = '';
+  document.getElementById('mdaily-kg').value   = '';
+  buildProductionHistory();
+}
+
+function addManualWeeklyRow() {
+  var week = (document.getElementById('mweekly-week') || {}).value || '';
+  var prod = (document.getElementById('mweekly-prod') || {}).value || '';
+  var kg   = parseFloat((document.getElementById('mweekly-kg') || {}).value) || 0;
+  if (!week.trim() || kg <= 0) { alert('נא למלא שבוע וק"ג'); return; }
+  var rows = JSON.parse(localStorage.getItem('matzah_manual_weekly_rows') || '[]');
+  rows.push({ week: week.trim(), prod: prod.trim(), kg: kg, id: Date.now() });
+  localStorage.setItem('matzah_manual_weekly_rows', JSON.stringify(rows));
+  document.getElementById('mweekly-week').value = '';
+  document.getElementById('mweekly-prod').value = '';
+  document.getElementById('mweekly-kg').value   = '';
+  buildProductionHistory();
+}
+
+function deleteManualDailyRow(id) {
+  var rows = JSON.parse(localStorage.getItem('matzah_manual_daily_rows') || '[]').filter(function(r){ return r.id !== id; });
+  localStorage.setItem('matzah_manual_daily_rows', JSON.stringify(rows));
+  buildProductionHistory();
+}
+
+function deleteManualWeeklyRow(id) {
+  var rows = JSON.parse(localStorage.getItem('matzah_manual_weekly_rows') || '[]').filter(function(r){ return r.id !== id; });
+  localStorage.setItem('matzah_manual_weekly_rows', JSON.stringify(rows));
+  buildProductionHistory();
+}
+
+function editDailyRow(key) {
+  var cur = (JSON.parse(localStorage.getItem('matzah_daily_ov') || '{}'))[key] || '';
+  var val = prompt('עריכת תפוקה יומית ל-' + key + '\nהזן ק"ג חדש (ריק = מחק עריכה ידנית):', cur);
+  if (val === null) return;
+  var ov = JSON.parse(localStorage.getItem('matzah_daily_ov') || '{}');
+  if (val.trim() === '') { delete ov[key]; } else { ov[key] = parseFloat(val) || 0; }
+  localStorage.setItem('matzah_daily_ov', JSON.stringify(ov));
+  buildProductionHistory();
+}
+
+function editWeeklyRow(key) {
+  var cur = (JSON.parse(localStorage.getItem('matzah_weekly_ov') || '{}'))[key] || '';
+  var val = prompt('עריכת תפוקה שבועית לשבוע ' + key + '\nהזן ק"ג חדש (ריק = מחק עריכה ידנית):', cur);
+  if (val === null) return;
+  var ov = JSON.parse(localStorage.getItem('matzah_weekly_ov') || '{}');
+  if (val.trim() === '') { delete ov[key]; } else { ov[key] = parseFloat(val) || 0; }
+  localStorage.setItem('matzah_weekly_ov', JSON.stringify(ov));
+  buildProductionHistory();
 }
 
 function updateProductInventory() {
@@ -7339,6 +7731,11 @@ function renderFinanceTab() {
   renderPaySection();
 }
 
+function renderProductionTab() {
+  buildProductionHistory();
+  buildPalletTracker();
+}
+
 var _OWNER_HOURS_KEY = 'matzah_owner_hours';
 
 function saveOwnerHours() {
@@ -8366,7 +8763,7 @@ function mktSendWA() {
   window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(txt.value), '_blank');
 }
 
-// --- Leads ---
+// --- Lea
 function mktAddLead() {
   var name  = document.getElementById('mkt-lead-name').value.trim();
   var phone = document.getElementById('mkt-lead-phone').value.trim();
@@ -8398,7 +8795,7 @@ function mktDeleteLead(id) {
   var next = [];
   for (var i = 0; i < mktLeads.length; i++) { if (mktLeads[i].id !== id) next.push(mktLeads[i]); }
   mktLeads = next;
-  mktSaveLeads();
+  
   mktRenderLeads();
   mktRenderStats();
 }
@@ -8846,7 +9243,7 @@ function mktCopyLandingLink() {
 </div>
 
 <!-- ===== DATA AGENT ===== -->
-<div id="agent-fab" onclick="toggleAgent()" title="סוכן נתונים">🤖</div>
+<div id="agent-fab" onclick="toggleAgent()" title="סוכן נתונים" style="display:none;">🤖</div>
 <div id="agent-panel">
   <div id="agent-panel-header">
     <div style="display:flex;align-items:center;gap:8px;">

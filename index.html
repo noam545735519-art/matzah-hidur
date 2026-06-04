@@ -940,6 +940,16 @@
           <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">הערות</div>
           <input id="p-notes" type="text" placeholder="—" style="width:100%;background:#0f1923;border:1px solid #2a3a50;border-radius:8px;padding:8px 10px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;direction:rtl;outline:none;">
         </div>
+        <div>
+          <div style="font-size:11px;color:#60a5fa;margin-bottom:4px;font-weight:700;">📦 מיקום</div>
+          <select id="p-location" style="width:100%;background:#0f1923;border:1px solid rgba(96,165,250,0.4);border-radius:8px;padding:8px 10px;color:#60a5fa;font-family:Heebo,Arial,sans-serif;font-size:13px;outline:none;cursor:pointer;">
+            <option value="">— בחר מיקום —</option>
+            <option value="מחסן למעלה">↑ מחסן למעלה</option>
+            <option value="מחסן למטה">↓ מחסן למטה</option>
+            <option value="קונטיינר 1">📦 קונטיינר 1</option>
+            <option value="קונטיינר 2">📦 קונטיינר 2</option>
+          </select>
+        </div>
         <button onclick="addProduction()" style="background:linear-gradient(135deg,#f0b429,#d97706);color:#0a1628;border:none;border-radius:8px;padding:9px 20px;font-weight:800;font-size:14px;cursor:pointer;font-family:Heebo,Arial,sans-serif;white-space:nowrap;">+ הוסף</button>
       </div>
     </div>
@@ -953,7 +963,7 @@
       </div>
       <div id="prod-log-body" style="display:none;margin-top:12px;">
         <table>
-          <thead><tr><th>תאריך</th><th>משמרת</th><th>סוג מצות</th><th>שעות עבודה</th><th>כמות יוצאת (ק"ג)</th><th style="color:#22c55e;">⚡ ק"ג/שעה</th><th>הערות</th><th>פעולות</th></tr></thead>
+          <thead><tr><th>תאריך</th><th>משמרת</th><th>סוג מצות</th><th>שעות עבודה</th><th>כמות יוצאת (ק"ג)</th><th style="color:#22c55e;">⚡ ק"ג/שעה</th><th>הערות</th><th style="color:#60a5fa;">📦 מיקום</th><th>פעולות</th></tr></thead>
           <tbody id="production-tbody">
             <tr id="prod-empty"><td colspan="8" style="text-align:center;color:#475569;padding:20px;">אין דיווחים עדיין</td></tr>
           </tbody>
@@ -1028,11 +1038,59 @@
         <span><span class="icon">📦</span> מעקב משטחים — ממוספרים אוטומטי</span>
         <div style="display:flex;gap:8px;">
           <span id="pallet-season-label" style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;align-self:center;"></span>
+          <button onclick="openManualPalletForm()" style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.35);color:#22c55e;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✏️ עריכה ידנית</button>
           <button onclick="viewSeasonsArchive()" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.35);color:#818cf8;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">📚 ארכיון עונות</button>
           <button onclick="resetPalletSeason()" style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.35);color:#f87171;border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">🔄 אפס עונה</button>
         </div>
       </div>
       <div id="pallet-tracker-body" style="margin-top:8px;"></div>
+      <div id="pallet-manual-form" style="display:none;margin-top:12px;border-top:1px solid rgba(34,197,94,0.2);padding-top:12px;">
+        <div style="font-size:13px;font-weight:700;color:#22c55e;font-family:Heebo,Arial,sans-serif;margin-bottom:10px;">✏️ עריכה ידנית — משטח</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">מספר משטח</label>
+            <input id="mpf-num" type="number" min="1" placeholder="#" style="width:70px;background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">מוצר</label>
+            <input id="mpf-prod" type="text" placeholder="שם מוצר" style="width:130px;background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">ק"ג</label>
+            <input id="mpf-kg" type="number" min="0" placeholder="0" style="width:80px;background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;text-align:center;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">סטטוס</label>
+            <select id="mpf-status" style="background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;">
+              <option value="מלא">מלא</option>
+              <option value="חלקי">חלקי</option>
+            </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">תאריך</label>
+            <input id="mpf-date" type="date" style="background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">הערה</label>
+            <input id="mpf-note" type="text" placeholder="אופציונלי" style="width:120px;background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <label style="font-size:11px;color:#64748b;font-family:Heebo,Arial,sans-serif;">📦 מיקום</label>
+            <select id="mpf-loc" style="background:#0f1923;border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:white;font-size:13px;font-family:Heebo,Arial,sans-serif;">
+              <option value="">— ללא —</option>
+              <option value="מחסן למעלה">מחסן למעלה</option>
+              <option value="מחסן למטה">מחסן למטה</option>
+              <option value="קונטיינר 1">קונטיינר 1</option>
+              <option value="קונטיינר 2">קונטיינר 2</option>
+            </select>
+          </div>
+          <button onclick="saveManualPalletRow()" style="background:rgba(34,197,94,0.2);border:1px solid #22c55e;color:#22c55e;border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">💾 שמור</button>
+          <button onclick="deleteManualPalletRow()" style="background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.35);color:#f87171;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;">🗑️ מחק</button>
+        </div>
+        <div id="mpf-msg" style="margin-top:8px;font-size:12px;font-family:Heebo,Arial,sans-serif;color:#22c55e;display:none;"></div>
+        <input type="hidden" id="mpf-orig-key">
+        <input type="hidden" id="mpf-is-manual">
+      </div>
       <div id="seasons-archive-panel" style="display:none;margin-top:12px;border-top:1px solid rgba(99,102,241,0.2);padding-top:12px;"></div>
     </div>
 
@@ -2436,6 +2494,42 @@ function importBackup(event) {
   event.target.value = '';
 }
 
+// ===== מיקומי משמרות =====
+var _SHIFT_LOC_KEY = 'matzah_shift_locations';
+
+function restoreShiftLocations() {
+  var locs = JSON.parse(localStorage.getItem(_SHIFT_LOC_KEY) || '{}');
+  document.querySelectorAll('#production-tbody tr').forEach(function(row) {
+    var sel = row.querySelector('.shift-loc-select');
+    if (!sel) return;
+    var date  = row.cells[0] ? row.cells[0].textContent.trim() : '';
+    var shift = row.cells[1] ? row.cells[1].textContent.trim() : '';
+    var prod  = row.cells[2] ? row.cells[2].textContent.trim() : '';
+    var key   = date + '___' + shift + '___' + prod;
+    if (locs[key]) { sel.value = locs[key]; sel.style.color = '#60a5fa'; }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var tbody = document.getElementById('production-tbody');
+  if (tbody) {
+    tbody.addEventListener('change', function(e) {
+      if (!e.target.classList.contains('shift-loc-select')) return;
+      var row = e.target.closest('tr');
+      if (!row || !row.cells) return;
+      var date  = row.cells[0] ? row.cells[0].textContent.trim() : '';
+      var shift = row.cells[1] ? row.cells[1].textContent.trim() : '';
+      var prod  = row.cells[2] ? row.cells[2].textContent.trim() : '';
+      var key   = date + '___' + shift + '___' + prod;
+      var locs  = JSON.parse(localStorage.getItem(_SHIFT_LOC_KEY) || '{}');
+      if (e.target.value) { locs[key] = e.target.value; e.target.style.color = '#60a5fa'; }
+      else { delete locs[key]; e.target.style.color = '#64748b'; }
+      localStorage.setItem(_SHIFT_LOC_KEY, JSON.stringify(locs));
+      buildPalletTracker();
+    });
+  }
+});
+
 // ===== שמירה ב-localStorage =====
 function saveData() {
   localStorage.setItem('matzah_orders',     document.getElementById('orders-tbody').innerHTML);
@@ -2456,6 +2550,7 @@ function loadData() {
   if (p) document.getElementById('production-tbody').innerHTML = p;
   if (i) document.getElementById('inventory-tbody').innerHTML  = i;
   if (n) orderNum = parseInt(n);
+  restoreShiftLocations();
   recalcProductionKgH();
   syncDashboard();
   updateShiftTotals();
@@ -2724,7 +2819,10 @@ function buildProductionHistory() {
         +'<td style="color:#a78bfa;font-size:12px;">'+( r.prod || '—')+'</td>'
         +'<td style="color:#f0b429;font-weight:700;">'+r.kg+' ק"ג</td>'
         +'<td style="color:#94a3b8;">—</td>'
-        +'<td><button onclick="deleteManualDailyRow('+r.id+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:12px;padding:0;" title="מחק">✕</button></td>'
+        +'<td style="display:flex;gap:4px;align-items:center;">'
+        +'<button onclick="editManualDailyRow('+r.id+')" style="background:none;border:1px solid rgba(255,255,255,0.15);color:#94a3b8;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;" title="עריכה">✏️</button>'
+        +'<button onclick="deleteManualDailyRow('+r.id+')" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:12px;padding:0;" title="מחק">✕</button>'
+        +'</td>'
         +'</tr>';
     }).join('');
     dTbody.innerHTML = dKeys.map(function(k) {
@@ -2832,6 +2930,188 @@ function resetPalletSeason() {
   alert('✓ העונה נשמרה בארכיון!\nניתן לצפות בה דרך כפתור "ארכיון עונות".');
 }
 
+var _MANUAL_PALLETS_KEY = 'matzah_manual_pallets';
+var _SHIPPED_KEY = 'matzah_pallet_shipped';
+var _LOCATION_KEY = 'matzah_pallet_location';
+var _WAREHOUSE_LOCATIONS = ['מחסן למעלה', 'מחסן למטה', 'קונטיינר 1', 'קונטיינר 2'];
+
+function openManualPalletForm() {
+  var form = document.getElementById('pallet-manual-form');
+  if (!form) return;
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  if (form.style.display === 'block') {
+    var today = new Date().toISOString().slice(0,10);
+    document.getElementById('mpf-date').value = today;
+    document.getElementById('mpf-num').value = '';
+    document.getElementById('mpf-prod').value = '';
+    document.getElementById('mpf-kg').value = '';
+    document.getElementById('mpf-note').value = '';
+    document.getElementById('mpf-loc').value = '';
+    document.getElementById('mpf-orig-key').value = '';
+    document.getElementById('mpf-is-manual').value = '';
+    document.getElementById('mpf-msg').style.display = 'none';
+  }
+}
+
+function saveManualPalletRow() {
+  var num = parseInt(document.getElementById('mpf-num').value);
+  var prod = document.getElementById('mpf-prod').value.trim();
+  var kg = parseFloat(document.getElementById('mpf-kg').value);
+  var status = document.getElementById('mpf-status').value;
+  var date = document.getElementById('mpf-date').value;
+  var note = document.getElementById('mpf-note').value.trim();
+  var loc = document.getElementById('mpf-loc').value;
+  var origKey = document.getElementById('mpf-orig-key').value;
+  var isManualEdit = document.getElementById('mpf-is-manual').value === '1';
+  if (!num || !prod || isNaN(kg)) {
+    alert('יש למלא מספר משטח, מוצר וק"ג');
+    return;
+  }
+  var newKey = prod + '___' + num;
+
+  // אם מספר שונה — עדכן את כל המפתחות
+  if (origKey && origKey !== newKey) {
+    var lastSep = origKey.lastIndexOf('___');
+    var origProd = origKey.substring(0, lastSep);
+    var origNum  = parseInt(origKey.substring(lastSep + 3));
+
+    // מחק רשומה ידנית ישנה
+    var allRows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+    allRows = allRows.filter(function(r){ return !(r.num===origNum && r.prod===origProd); });
+    localStorage.setItem(_MANUAL_PALLETS_KEY, JSON.stringify(allRows));
+
+    // העבר מיקום
+    var locs2 = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+    if (locs2[origKey]) { locs2[newKey] = locs2[origKey]; delete locs2[origKey]; }
+    localStorage.setItem(_LOCATION_KEY, JSON.stringify(locs2));
+
+    // העבר שנשלח
+    var sh = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+    if (sh[origKey]) { sh[newKey] = sh[origKey]; delete sh[origKey]; }
+    localStorage.setItem(_SHIPPED_KEY, JSON.stringify(sh));
+
+    // העבר overrides
+    var ov2 = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+    if (ov2[origKey]) { ov2[newKey] = ov2[origKey]; delete ov2[origKey]; }
+    localStorage.setItem(_PALLET_OV_KEY, JSON.stringify(ov2));
+
+    document.getElementById('mpf-orig-key').value = newKey;
+  }
+
+  var rows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+  var idx = rows.findIndex(function(r){ return r.num===num && r.prod===prod; });
+  var row = { num:num, prod:prod, kg:kg, status:status, date:date, note:note };
+  if (idx >= 0) rows[idx] = row; else rows.push(row);
+  localStorage.setItem(_MANUAL_PALLETS_KEY, JSON.stringify(rows));
+  var locs = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+  if (loc) locs[newKey] = loc; else delete locs[newKey];
+  localStorage.setItem(_LOCATION_KEY, JSON.stringify(locs));
+  var msg = document.getElementById('mpf-msg');
+  msg.textContent = '✓ משטח #' + num + ' — ' + prod + ' נשמר';
+  msg.style.display = 'block';
+  buildPalletTracker();
+}
+
+function deleteManualPalletRow() {
+  var num = parseInt(document.getElementById('mpf-num').value);
+  var prod = document.getElementById('mpf-prod').value.trim();
+  if (!num || !prod) { alert('הזן מספר משטח ומוצר למחיקה'); return; }
+  var rows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+  rows = rows.filter(function(r){ return !(r.num===num && r.prod===prod); });
+  localStorage.setItem(_MANUAL_PALLETS_KEY, JSON.stringify(rows));
+  var msg = document.getElementById('mpf-msg');
+  msg.textContent = '🗑️ משטח #' + num + ' — ' + prod + ' נמחק';
+  msg.style.display = 'block';
+  buildPalletTracker();
+}
+
+function togglePalletShipped(prod, num) {
+  var key = prod + '___' + num;
+  var shipped = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+  if (shipped[key]) {
+    delete shipped[key];
+  } else {
+    shipped[key] = true;
+    // כשיוצא ללקוח — נקה מיקום
+    var locs = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+    delete locs[key];
+    localStorage.setItem(_LOCATION_KEY, JSON.stringify(locs));
+  }
+  localStorage.setItem(_SHIPPED_KEY, JSON.stringify(shipped));
+  buildPalletTracker();
+  if (typeof updateProductInventory === 'function') updateProductInventory();
+}
+
+function setPalletLocation(prod, num, loc) {
+  var key = prod + '___' + num;
+  var locs = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+  if (loc === '') delete locs[key];
+  else locs[key] = loc;
+  localStorage.setItem(_LOCATION_KEY, JSON.stringify(locs));
+  buildPalletTracker();
+}
+
+function bulkShipPallets(prod, inputId) {
+  var n = parseInt(document.getElementById(inputId).value);
+  if (!n || n < 1) { alert('הזן מספר משטחים'); return; }
+  var shipped = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+  var count = 0;
+  // סמן את המשטחים הראשונים שעדיין לא יצאו
+  var allPallets = _getAllPalletsForProd(prod);
+  allPallets.forEach(function(p) {
+    if (count >= n) return;
+    var key = prod + '___' + p.num;
+    if (!shipped[key]) { shipped[key] = true; count++; }
+  });
+  localStorage.setItem(_SHIPPED_KEY, JSON.stringify(shipped));
+  document.getElementById(inputId).value = '';
+  buildPalletTracker();
+  if (typeof updateProductInventory === 'function') updateProductInventory();
+  alert('✓ ' + count + ' משטחים של ' + prod + ' סומנו כ"יצא"');
+}
+
+function _getAllPalletsForProd(prod) {
+  // מחזיר את כל המשטחים של מוצר ספציפי (אותו חישוב כמו buildPalletTracker)
+  var palletSettings = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
+  var seasonDate = localStorage.getItem(_PALLET_SEASON_KEY) || '';
+  var yr = new Date().getFullYear();
+  var prodEntries = [];
+  Array.from(document.querySelectorAll('#production-tbody tr')).forEach(function(r) {
+    if (!r.cells[0] || !r.cells[4] || !r.cells[2]) return;
+    var date = r.cells[0].textContent.trim();
+    if (date.indexOf('/') === -1) return;
+    var p = r.cells[2].textContent.trim();
+    var kg = parseFloat(r.cells[4].textContent.replace(/[^\d.]/g,'')) || 0;
+    if (p === prod && kg > 0) prodEntries.push({ date: date, kg: kg });
+  });
+  var manualDailyRows = JSON.parse(localStorage.getItem('matzah_manual_daily_rows') || '[]');
+  manualDailyRows.forEach(function(m) {
+    if (!m.prod || m.prod !== prod || !m.kg) return;
+    var dateStr = m.date;
+    if (dateStr.indexOf('-') !== -1) { var pts = dateStr.split('-'); dateStr = pts[2]+'/'+pts[1]; }
+    prodEntries.push({ date: dateStr, kg: m.kg });
+  });
+  prodEntries.sort(function(a,b) {
+    var pa=a.date.split('/'), pb=b.date.split('/');
+    return new Date(yr,parseInt(pa[1])-1,parseInt(pa[0])).getTime()-new Date(yr,parseInt(pb[1])-1,parseInt(pb[0])).getTime();
+  });
+  var kgPer = palletSettings[prod] || 120;
+  var next=1, filled=0, pallets=[];
+  prodEntries.forEach(function(e) {
+    if (seasonDate) {
+      var pts=e.date.split('/');
+      if (new Date(yr,parseInt(pts[1])-1,parseInt(pts[0])).getTime() < new Date(seasonDate).getTime()) return;
+    }
+    var rem=e.kg;
+    while(rem>0){
+      var space=kgPer-filled;
+      if(rem>=space){filled=0;rem-=space;pallets.push({num:next,filledKg:kgPer});next++;}
+      else{filled+=rem;rem=0;if(!pallets[next-1])pallets.push({num:next,filledKg:filled});}
+    }
+  });
+  return pallets;
+}
+
 function viewSeasonsArchive() {
   var archive = JSON.parse(localStorage.getItem(_SEASONS_ARCHIVE_KEY) || '[]');
   var panel = document.getElementById('seasons-archive-panel');
@@ -2879,15 +3159,69 @@ function viewSeasonsArchive() {
   panel.style.display = 'block';
 }
 
-function editPalletRow(prod, num) {
-  var ovKey = prod + '___' + num;
-  var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
-  var cur = ov[ovKey] ? ov[ovKey].note : '';
-  var val = prompt('עריכת משטח #' + num + ' — ' + prod + '\nהזן הערה / מספור ידני (ריק = מחק עריכה):', cur);
-  if (val === null) return;
-  if (val.trim() === '') { delete ov[ovKey]; } else { if (!ov[ovKey]) ov[ovKey] = {}; ov[ovKey].note = val.trim(); }
-  localStorage.setItem(_PALLET_OV_KEY, JSON.stringify(ov));
-  buildPalletTracker();
+function renamePallet(prod, origNum, newNum, isManual) {
+  if (!newNum || origNum === newNum) return;
+  var origKey = prod + '___' + origNum;
+  var newKey  = prod + '___' + newNum;
+
+  if (isManual) {
+    // שנה את המספר ברשומה הידנית
+    var rows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+    var idx = rows.findIndex(function(r){ return r.num===origNum && r.prod===prod; });
+    if (idx >= 0) rows[idx].num = newNum;
+    localStorage.setItem(_MANUAL_PALLETS_KEY, JSON.stringify(rows));
+    // העבר מפתחות
+    var locs = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+    if (locs[origKey]) { locs[newKey] = locs[origKey]; delete locs[origKey]; }
+    localStorage.setItem(_LOCATION_KEY, JSON.stringify(locs));
+    var sh = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+    if (sh[origKey]) { sh[newKey] = sh[origKey]; delete sh[origKey]; }
+    localStorage.setItem(_SHIPPED_KEY, JSON.stringify(sh));
+    var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+    if (ov[origKey]) { ov[newKey] = ov[origKey]; delete ov[origKey]; }
+    localStorage.setItem(_PALLET_OV_KEY, JSON.stringify(ov));
+  } else {
+    // משטח אוטומטי — שמור מספר תצוגה בלבד
+    var ov2 = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+    if (!ov2[origKey]) ov2[origKey] = {};
+    ov2[origKey].numDisplay = newNum;
+    localStorage.setItem(_PALLET_OV_KEY, JSON.stringify(ov2));
+  }
+}
+
+function editPalletRow(prod, num, isManual) {
+  var form = document.getElementById('pallet-manual-form');
+  if (!form) return;
+  form.style.display = 'block';
+  form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  var origKey = prod + '___' + num;
+  document.getElementById('mpf-orig-key').value = origKey;
+  document.getElementById('mpf-is-manual').value = isManual ? '1' : '0';
+  document.getElementById('mpf-num').value = num;
+  document.getElementById('mpf-prod').value = prod;
+  document.getElementById('mpf-msg').style.display = 'none';
+
+  if (isManual) {
+    var rows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+    var row = rows.find(function(r){ return r.num===num && r.prod===prod; });
+    if (row) {
+      document.getElementById('mpf-kg').value = row.kg;
+      document.getElementById('mpf-status').value = row.status || 'מלא';
+      document.getElementById('mpf-date').value = row.date || '';
+      document.getElementById('mpf-note').value = row.note || '';
+    }
+  } else {
+    var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
+    var cur = ov[origKey] || {};
+    document.getElementById('mpf-kg').value = '';
+    document.getElementById('mpf-status').value = 'מלא';
+    document.getElementById('mpf-date').value = '';
+    document.getElementById('mpf-note').value = cur.note || '';
+  }
+
+  var locs = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
+  document.getElementById('mpf-loc').value = locs[origKey] || '';
 }
 
 function buildPalletTracker() {
@@ -2901,27 +3235,47 @@ function buildPalletTracker() {
   var palletSettings = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
   var ov = JSON.parse(localStorage.getItem(_PALLET_OV_KEY) || '{}');
 
-  // אסוף שורות ייצור
-  var rows = Array.from(document.querySelectorAll('#production-tbody tr')).filter(function(r) {
-    return r.cells[0] && r.cells[4] && r.cells[2] &&
-           r.cells[0].textContent.trim().indexOf('/') !== -1;
+  // אסוף שורות ייצור מה-DOM
+  var yr = new Date().getFullYear();
+  var shiftLocs = JSON.parse(localStorage.getItem(_SHIFT_LOC_KEY) || '{}');
+  var prodEntries = [];
+  Array.from(document.querySelectorAll('#production-tbody tr')).forEach(function(r) {
+    if (!r.cells[0] || !r.cells[4] || !r.cells[2]) return;
+    var date  = r.cells[0].textContent.trim();
+    if (date.indexOf('/') === -1) return;
+    var shift = r.cells[1] ? r.cells[1].textContent.trim() : '';
+    var prod  = r.cells[2].textContent.trim();
+    var kg    = parseFloat(r.cells[4].textContent.replace(/[^\d.]/g,'')) || 0;
+    var loc   = shiftLocs[date + '___' + shift + '___' + prod] || '';
+    if (prod && prod !== '—' && kg > 0) prodEntries.push({ date: date, prod: prod, kg: kg, loc: loc });
+  });
+
+  // הוסף גם שורות ידניות מ-matzah_manual_daily_rows
+  var manualDailyRows = JSON.parse(localStorage.getItem('matzah_manual_daily_rows') || '[]');
+  manualDailyRows.forEach(function(m) {
+    if (!m.prod || !m.kg || !m.date) return;
+    var dateStr = m.date;
+    if (dateStr.indexOf('-') !== -1) {
+      var parts = dateStr.split('-');
+      dateStr = parts[2] + '/' + parts[1];
+    }
+    prodEntries.push({ date: dateStr, prod: m.prod, kg: m.kg, loc: '' });
   });
 
   // מיין לפי תאריך
-  var yr = new Date().getFullYear();
-  rows.sort(function(a, b) {
-    var pa = a.cells[0].textContent.trim().split('/');
-    var pb = b.cells[0].textContent.trim().split('/');
+  prodEntries.sort(function(a, b) {
+    var pa = a.date.split('/');
+    var pb = b.date.split('/');
     return new Date(yr, parseInt(pa[1])-1, parseInt(pa[0])).getTime()
          - new Date(yr, parseInt(pb[1])-1, parseInt(pb[0])).getTime();
   });
 
   // עבד לפי מוצר
   var byProd = {};
-  rows.forEach(function(row) {
-    var date = row.cells[0].textContent.trim();
-    var prod = row.cells[2].textContent.trim();
-    var kg   = parseFloat(row.cells[4].textContent.replace(/[^\d.]/g,'')) || 0;
+  prodEntries.forEach(function(entry) {
+    var date = entry.date;
+    var prod = entry.prod;
+    var kg   = entry.kg;
     if (!prod || prod === '—' || kg <= 0) return;
 
     // סנן לפי עונה
@@ -2937,6 +3291,7 @@ function buildPalletTracker() {
     var state = byProd[prod];
     var rem = kg;
 
+    var entryLoc = entry.loc || '';
     while (rem > 0) {
       var space = kgPer - state.filled;
       if (rem >= space) {
@@ -2944,8 +3299,8 @@ function buildPalletTracker() {
         state.filled = 0;
         rem -= space;
         var existing = state.pallets[state.next - 1];
-        if (existing) { existing.filledKg = kgPer; existing.status = 'מלא'; existing.lastDate = date; }
-        else state.pallets.push({ num: state.next, prod: prod, filledKg: kgPer, kgPer: kgPer, status: 'מלא', startDate: date, lastDate: date });
+        if (existing) { existing.filledKg = kgPer; existing.status = 'מלא'; existing.lastDate = date; if (entryLoc) existing.shiftLoc = entryLoc; }
+        else state.pallets.push({ num: state.next, prod: prod, filledKg: kgPer, kgPer: kgPer, status: 'מלא', startDate: date, lastDate: date, shiftLoc: entryLoc });
         state.next++;
       } else {
         // חלקי
@@ -2953,8 +3308,8 @@ function buildPalletTracker() {
         rem = 0;
         var pct = Math.round(state.filled / kgPer * 100);
         var ex2 = state.pallets[state.next - 1];
-        if (ex2) { ex2.filledKg = state.filled; ex2.status = 'חלקי ' + pct + '%'; ex2.lastDate = date; }
-        else state.pallets.push({ num: state.next, prod: prod, filledKg: state.filled, kgPer: kgPer, status: 'חלקי ' + pct + '%', startDate: date, lastDate: date });
+        if (ex2) { ex2.filledKg = state.filled; ex2.status = 'חלקי ' + pct + '%'; ex2.lastDate = date; if (entryLoc) ex2.shiftLoc = entryLoc; }
+        else state.pallets.push({ num: state.next, prod: prod, filledKg: state.filled, kgPer: kgPer, status: 'חלקי ' + pct + '%', startDate: date, lastDate: date, shiftLoc: entryLoc });
       }
     }
   });
@@ -2962,52 +3317,171 @@ function buildPalletTracker() {
   var allPallets = [];
   Object.keys(byProd).forEach(function(p) { byProd[p].pallets.forEach(function(pl) { allPallets.push(pl); }); });
 
+  // הוסף שורות ידניות
+  var manualRows = JSON.parse(localStorage.getItem(_MANUAL_PALLETS_KEY) || '[]');
+  manualRows.forEach(function(m) {
+    var kgPer = (JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}'))[m.prod] || 120;
+    allPallets.push({ num: m.num, prod: m.prod, filledKg: m.kg, kgPer: kgPer, status: m.status, lastDate: m.date, startDate: m.date, note: m.note, isManual: true });
+  });
+
   if (!allPallets.length) {
     body.innerHTML = '<div style="text-align:center;color:#475569;font-size:12px;font-family:Heebo,Arial,sans-serif;padding:16px;">אין נתוני ייצור — הזן משמרות בטאב ייצור</div>';
     return;
   }
 
-  var html = '<table style="width:100%;border-collapse:collapse;font-family:Heebo,Arial,sans-serif;font-size:12px;">'
-    + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1);">'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">#</th>'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">מוצר</th>'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">ק"ג</th>'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">סטטוס</th>'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">תאריך</th>'
-    + '<th style="text-align:right;padding:6px 8px;color:#64748b;font-weight:600;">הערה</th>'
-    + '<th style="padding:6px 4px;"></th>'
-    + '</tr></thead><tbody>';
+  var shipped = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+  var locations = JSON.parse(localStorage.getItem(_LOCATION_KEY) || '{}');
 
+  // קבץ לפי מוצר
+  var grouped = {};
   allPallets.forEach(function(p) {
-    var ovKey = p.prod + '___' + p.num;
-    var note  = ov[ovKey] ? ov[ovKey].note : '';
-    var isFull   = p.status === 'מלא';
-    var statusColor = isFull ? '#22c55e' : '#f0b429';
-    var barW = Math.round(p.filledKg / p.kgPer * 100);
-    var safeP = p.prod.replace(/'/g,"\\'");
-    html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);">'
-      + '<td style="padding:7px 8px;color:#60a5fa;font-weight:800;">משטח #' + p.num + '</td>'
-      + '<td style="padding:7px 8px;color:#f0b429;font-weight:600;">' + p.prod + '</td>'
-      + '<td style="padding:7px 8px;">'
-        + '<div style="display:flex;align-items:center;gap:6px;">'
-        + '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:8px;width:60px;overflow:hidden;">'
-        + '<div style="background:'+statusColor+';height:100%;width:'+barW+'%;border-radius:4px;"></div></div>'
-        + '<span style="color:white;font-weight:700;">'+p.filledKg+'<span style="color:#475569;font-size:10px;">/'+p.kgPer+'</span></span>'
-        + '</div></td>'
-      + '<td style="padding:7px 8px;color:'+statusColor+';font-weight:700;">' + p.status + '</td>'
-      + '<td style="padding:7px 8px;color:#64748b;">' + (p.lastDate || '—') + '</td>'
-      + '<td style="padding:7px 8px;color:#94a3b8;font-size:11px;">' + (note || '') + '</td>'
-      + '<td style="padding:7px 4px;"><button data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" class="pallet-edit-btn" style="background:none;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✏️</button></td>'
-      + '</tr>';
+    if (!grouped[p.prod]) grouped[p.prod] = [];
+    grouped[p.prod].push(p);
   });
 
-  html += '</tbody></table>';
+  var html = '';
+  Object.keys(grouped).forEach(function(prod, gi) {
+    var pallets = grouped[prod];
+    var total = pallets.length;
+    var full  = pallets.filter(function(p){ return p.status === 'מלא'; }).length;
+    var totalKg = pallets.reduce(function(s,p){ return s + (p.filledKg||0); }, 0);
+    var lastPallet = pallets[pallets.length - 1];
+    var hasPartial = lastPallet && lastPallet.status !== 'מלא';
+    var accordionId = 'pallet-acc-' + gi;
+    var bulkInputId = 'bulk-ship-' + gi;
+    var shippedCount = pallets.filter(function(p){ return shipped[prod+'___'+p.num]; }).length;
+    var locCounts = {};
+    pallets.forEach(function(p) {
+      var loc = locations[prod+'___'+p.num];
+      if (loc && !shipped[prod+'___'+p.num]) locCounts[loc] = (locCounts[loc]||0) + 1;
+    });
+    var unassigned = pallets.filter(function(p){ return !shipped[prod+'___'+p.num] && !locations[prod+'___'+p.num]; }).length;
+    var inStockCount = total - shippedCount;
+
+    html += '<div style="border:1px solid rgba(240,180,41,0.18);border-radius:10px;margin-bottom:8px;overflow:hidden;">'
+      // כותרת accordion
+      + '<div class="pallet-acc-header" data-acc="'+accordionId+'" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;cursor:pointer;background:rgba(240,180,41,0.06);user-select:none;flex-wrap:wrap;gap:6px;">'
+        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+          + '<span style="color:#f0b429;font-weight:800;font-family:Heebo,Arial,sans-serif;font-size:14px;">' + prod + '</span>'
+          + '<span style="background:rgba(96,165,250,0.15);color:#60a5fa;border-radius:20px;padding:2px 10px;font-size:12px;font-family:Heebo,Arial,sans-serif;font-weight:700;">' + total + ' משטחים</span>'
+          + (unassigned > 0 ? '<span style="color:#94a3b8;font-size:12px;font-family:Heebo,Arial,sans-serif;">📦 ' + unassigned + ' לא שויך</span>' : '')
+          + Object.keys(locCounts).map(function(loc){ return '<span style="color:#22c55e;font-size:12px;font-family:Heebo,Arial,sans-serif;background:rgba(34,197,94,0.1);border-radius:10px;padding:1px 8px;">'+loc+': '+locCounts[loc]+'</span>'; }).join('')
+          + (shippedCount > 0 ? '<span style="color:#f87171;font-size:12px;font-family:Heebo,Arial,sans-serif;">🚚 יצא ללקוח: ' + shippedCount + '</span>' : '')
+        + '</div>'
+        + '<div style="display:flex;align-items:center;gap:6px;" onclick="event.stopPropagation();">'
+          + '<input id="'+bulkInputId+'" type="number" min="1" placeholder="כמה?" style="width:65px;background:#0f1923;border:1px solid rgba(248,113,113,0.4);border-radius:6px;padding:4px 6px;color:white;font-size:12px;font-family:Heebo,Arial,sans-serif;text-align:center;">'
+          + '<button onclick="bulkShipPallets(\''+prod.replace(/'/g,"\\'").replace(/"/g,'&quot;')+'\',\''+bulkInputId+'\')" style="background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.4);color:#f87171;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:Heebo,Arial,sans-serif;white-space:nowrap;">🚚 שלח</button>'
+          + '<span class="pallet-acc-arrow" style="color:#64748b;font-size:14px;transition:transform 0.2s;cursor:pointer;" onclick="event.stopPropagation();this.closest(\'.pallet-acc-header\').click();">▼</span>'
+        + '</div>'
+      + '</div>'
+      // תוכן מוסתר
+      + '<div id="'+accordionId+'" style="display:none;">'
+        + '<table style="width:100%;border-collapse:collapse;font-family:Heebo,Arial,sans-serif;font-size:12px;">'
+        + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08);">'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">#</th>'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">ק"ג</th>'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">סטטוס</th>'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">מיקום במחסן</th>'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">תאריך</th>'
+        + '<th style="text-align:right;padding:6px 10px;color:#64748b;font-weight:600;">הערה</th>'
+        + '<th style="padding:6px 4px;"></th>'
+        + '</tr></thead><tbody>';
+
+    pallets.forEach(function(p) {
+      var ovKey = p.prod + '___' + p.num;
+      var note = p.isManual ? (p.note || '') : (ov[ovKey] ? ov[ovKey].note : '');
+      var isFull = p.status === 'מלא';
+      var statusColor = isFull ? '#22c55e' : '#f0b429';
+      var barW = Math.min(100, Math.round(p.filledKg / p.kgPer * 100));
+      var isShipped = !!shipped[p.prod + '___' + p.num];
+      var curLoc = locations[p.prod + '___' + p.num] || p.shiftLoc || '';
+      var rowBg = isShipped ? 'background:rgba(248,113,113,0.04);opacity:0.6;' : (curLoc ? 'background:rgba(34,197,94,0.04);' : (p.isManual ? 'background:rgba(167,139,250,0.04);' : ''));
+      var shipBtn = '<button data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" class="pallet-ship-btn" style="background:'+(isShipped?'rgba(248,113,113,0.15)':'rgba(34,197,94,0.1)')+';border:1px solid '+(isShipped?'rgba(248,113,113,0.4)':'rgba(34,197,94,0.3)')+';color:'+(isShipped?'#f87171':'#22c55e')+';border-radius:6px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;white-space:nowrap;">'+(isShipped?'🚚 יצא ללקוח':'✓ במחסן')+'</button>';
+      var safeProdLoc = p.prod.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      var locOptions = '<option value="">— מיקום —</option>'
+        + _WAREHOUSE_LOCATIONS.map(function(l){ return '<option value="'+l+'"'+(curLoc===l?' selected':'')+'>'+l+'</option>'; }).join('');
+      var locSelect = isShipped ? '<span style="color:#64748b;font-size:11px;font-family:Heebo,Arial,sans-serif;">יצא ללקוח</span>'
+        : '<select class="pallet-loc-sel" data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" style="background:#0f1923;border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:3px 6px;color:'+(curLoc?'#22c55e':'#64748b')+';font-size:11px;font-family:Heebo,Arial,sans-serif;cursor:pointer;">'+locOptions+'</select>';
+      var displayNum = (ov[ovKey] && ov[ovKey].numDisplay) ? ov[ovKey].numDisplay : p.num;
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,0.04);'+rowBg+'">'
+        + '<td class="pallet-num-cell" data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" data-manual="'+(p.isManual?'1':'0')+'" style="padding:7px 10px;color:'+(isShipped?'#64748b':'#60a5fa')+';font-weight:800;cursor:pointer;white-space:nowrap;" title="לחץ לשינוי מספר">משטח #' + displayNum + (p.isManual ? ' <span style="font-size:9px;color:#a78bfa;">ידני</span>' : '') + '</td>'
+        + '<td style="padding:7px 10px;">'
+          + '<div style="display:flex;align-items:center;gap:6px;">'
+          + '<div style="background:rgba(255,255,255,0.06);border-radius:4px;height:7px;width:55px;overflow:hidden;">'
+          + '<div style="background:'+statusColor+';height:100%;width:'+barW+'%;border-radius:4px;"></div></div>'
+          + '<span style="color:white;font-weight:700;">'+p.filledKg+'<span style="color:#475569;font-size:10px;">/'+p.kgPer+'</span></span>'
+          + '</div></td>'
+        + '<td style="padding:7px 10px;color:'+statusColor+';font-weight:700;">' + p.status + '</td>'
+        + '<td style="padding:7px 10px;">' + locSelect + '</td>'
+        + '<td style="padding:7px 4px;display:flex;gap:4px;align-items:center;">'
+          + shipBtn
+          + '<button data-prod="'+p.prod.replace(/"/g,'&quot;')+'" data-num="'+p.num+'" data-manual="'+(p.isManual?'1':'0')+'" class="pallet-edit-btn" style="background:none;border:1px solid rgba(255,255,255,0.12);color:#94a3b8;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✏️</button>'
+        + '</td>'
+        + '</tr>';
+    });
+
+    html += '</tbody></table></div></div>';
+  });
+
   body.innerHTML = html;
 
-  // חיבור כפתורי עריכה דרך event delegation
+  // פתיחה/סגירה של accordion
+  body.querySelectorAll('.pallet-acc-header').forEach(function(hdr) {
+    hdr.addEventListener('click', function() {
+      var id = this.getAttribute('data-acc');
+      var content = document.getElementById(id);
+      var arrow = this.querySelector('.pallet-acc-arrow');
+      if (!content) return;
+      var open = content.style.display !== 'none';
+      content.style.display = open ? 'none' : 'block';
+      if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+    });
+  });
+
+  // עריכה inline של מספר משטח
+  body.querySelectorAll('.pallet-num-cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+      if (this.querySelector('input')) return;
+      var prod     = this.getAttribute('data-prod');
+      var origNum  = parseInt(this.getAttribute('data-num'));
+      var isManual = this.getAttribute('data-manual') === '1';
+      var self = this;
+      var origHTML = self.innerHTML;
+      self.innerHTML = '<input type="number" value="'+origNum+'" min="1" style="width:58px;background:#0f1923;border:1px solid #60a5fa;border-radius:4px;padding:2px 5px;color:white;font-size:12px;font-family:Heebo,Arial,sans-serif;text-align:center;">';
+      var inp = self.querySelector('input');
+      inp.focus(); inp.select();
+      function applyRename() {
+        var newNum = parseInt(inp.value);
+        if (!newNum || isNaN(newNum)) { self.innerHTML = origHTML; return; }
+        renamePallet(prod, origNum, newNum, isManual);
+        buildPalletTracker();
+      }
+      inp.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); applyRename(); }
+        if (e.key === 'Escape') { self.innerHTML = origHTML; }
+      });
+      inp.addEventListener('blur', applyRename);
+    });
+  });
+
+  // חיבור כפתורי עריכה
   body.querySelectorAll('.pallet-edit-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      editPalletRow(this.getAttribute('data-prod'), parseInt(this.getAttribute('data-num')));
+      editPalletRow(this.getAttribute('data-prod'), parseInt(this.getAttribute('data-num')), this.getAttribute('data-manual')==='1');
+    });
+  });
+
+  // חיבור כפתורי יצא ללקוח
+  body.querySelectorAll('.pallet-ship-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      togglePalletShipped(this.getAttribute('data-prod'), parseInt(this.getAttribute('data-num')));
+    });
+  });
+
+  // חיבור dropdown מיקום
+  body.querySelectorAll('.pallet-loc-sel').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      setPalletLocation(this.getAttribute('data-prod'), parseInt(this.getAttribute('data-num')), this.value);
     });
   });
 }
@@ -3049,6 +3523,24 @@ function addManualWeeklyRow() {
   document.getElementById('mweekly-prod').value = '';
   document.getElementById('mweekly-kg').value   = '';
   buildProductionHistory();
+}
+
+function editManualDailyRow(id) {
+  var rows = JSON.parse(localStorage.getItem('matzah_manual_daily_rows') || '[]');
+  var row = rows.find(function(r){ return r.id === id; });
+  if (!row) return;
+  var newDate = prompt('תאריך (DD/MM):', row.date);
+  if (newDate === null) return;
+  var newProd = prompt('מוצר:', row.prod || '');
+  if (newProd === null) return;
+  var newKg = prompt('ק"ג:', row.kg);
+  if (newKg === null) return;
+  row.date = newDate.trim() || row.date;
+  row.prod = newProd.trim() || row.prod;
+  row.kg   = parseFloat(newKg) || row.kg;
+  localStorage.setItem('matzah_manual_daily_rows', JSON.stringify(rows));
+  buildProductionHistory();
+  buildPalletTracker();
 }
 
 function deleteManualDailyRow(id) {
@@ -3096,6 +3588,18 @@ function updateProductInventory() {
     if (!stock[prod]) stock[prod] = { kg: 0, lastDate: '' };
     stock[prod].kg += kg;
     if (date && date !== '—') stock[prod].lastDate = date;
+  });
+
+  // חסר ק"ג שיצאו (משטחים מסומנים כ"יצא")
+  var _shippedData = JSON.parse(localStorage.getItem(_SHIPPED_KEY) || '{}');
+  var _palletSet = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
+  Object.keys(_shippedData).forEach(function(key) {
+    var parts = key.split('___');
+    if (parts.length < 2) return;
+    var prod = parts[0];
+    var kgPer = _palletSet[prod] || 120;
+    if (!stock[prod]) stock[prod] = { kg: 0, lastDate: '' };
+    stock[prod].kg = Math.max(0, stock[prod].kg - kgPer);
   });
 
   var entries = Object.keys(stock).filter(function(k) { return stock[k].kg > 0; });
@@ -3472,6 +3976,7 @@ function calcStockSync() {
   }
 
   // 4. בנה שורות
+  var palletSettings = JSON.parse(localStorage.getItem('matzah_pallet_settings') || '{}');
   var shortages = 0, totalOrdered = 0, totalStock = 0;
   var rowsHtml = allProds.map(function(prod, idx) {
     var inStock   = stock[prod]   || 0;
@@ -3483,14 +3988,24 @@ function calcStockSync() {
     if (remaining > 0)       { color = '#22c55e'; icon = ''; }
     else if (remaining === 0) { color = '#f0b429'; icon = ''; }
     else                      { color = '#f87171'; icon = '⚠️ '; shortages++; }
-    var u = prod.indexOf('סטים') !== -1 ? 'יח\'' : 'ק"ג';
+    var isSets = prod.indexOf('סטים') !== -1;
+    var u = isSets ? 'יח\'' : 'ק"ג';
     var safeP = prod.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     var btnBase = 'border-radius:6px;padding:3px 9px;cursor:pointer;font-size:12px;font-family:Heebo,Arial,sans-serif;';
+
+    // חישוב משטחים (רק לק"ג, לא לסטים)
+    function palletStr(kg) {
+      if (isSets) return '';
+      var kgPer = palletSettings[prod] || 120;
+      var p = Math.round((kg / kgPer) * 10) / 10;
+      return ' <span style="font-size:10px;color:#818cf8;font-weight:600;">(' + p + ' משטחים)</span>';
+    }
+
     var mainRow = '<tr>'
       + '<td style="color:#f0b429;font-weight:700;">' + prod + '</td>'
-      + '<td id="sync-stk-' + idx + '" style="color:#22c55e;font-weight:700;">' + inStock + ' ' + u + '</td>'
-      + '<td style="color:#60a5fa;font-weight:700;">' + inOrders + ' ' + u + '</td>'
-      + '<td style="color:' + color + ';font-weight:800;">' + icon + remaining + ' ' + u + '</td>'
+      + '<td id="sync-stk-' + idx + '" style="color:#22c55e;font-weight:700;">' + inStock + ' ' + u + palletStr(inStock) + '</td>'
+      + '<td style="color:#60a5fa;font-weight:700;">' + inOrders + ' ' + u + palletStr(inOrders) + '</td>'
+      + '<td style="color:' + color + ';font-weight:800;">' + icon + remaining + ' ' + u + palletStr(remaining) + '</td>'
       + '<td style="white-space:nowrap;text-align:center;">'
       +   '<button id="sync-exp-arrow-' + idx + '" onclick="toggleSyncExpand(' + idx + ',\'' + safeP + '\')" title="פרט לקוחות" style="background:rgba(148,163,184,0.12);border:1px solid rgba(148,163,184,0.3);color:#94a3b8;' + btnBase + 'margin-left:3px;transition:background 0.2s;">▶</button>'
       +   '<button onclick="editSyncStock(' + idx + ',\'' + safeP + '\',' + inStock + ')" title="ערוך מלאי" style="background:rgba(240,180,41,0.12);border:1px solid rgba(240,180,41,0.35);color:#f0b429;' + btnBase + 'margin-left:3px;">✏️</button>'
@@ -3723,7 +4238,8 @@ function addProduction() {
   }
   var hours   = document.getElementById('p-hours').value.trim();
   var kg      = document.getElementById('p-kg').value.trim();
-  var notes   = document.getElementById('p-notes').value.trim() || '—';
+  var notes    = document.getElementById('p-notes').value.trim() || '—';
+  var location = document.getElementById('p-location').value;
   if (!kg) { alert('חובה: כמות ק"ג'); return; }
   var dateStr = date ? date.split('-').reverse().join('/').slice(0,5) : '—';
   var empty = document.getElementById('prod-empty');
@@ -3732,8 +4248,22 @@ function addProduction() {
   var row = tbody.insertRow(0);
   var ec = ' onclick="editCell(this)" style="cursor:pointer;"';
   var kgH = (parseFloat(hours) > 0 && parseFloat(kg) > 0) ? (parseFloat(kg) / parseFloat(hours)).toFixed(1) : '—';
-  row.innerHTML = '<td'+ec+'>'+dateStr+'</td><td'+ec+'>'+team+'</td><td'+ec+' style="color:#f0b429;font-weight:600;cursor:pointer;">'+product+'</td><td'+ec+'>'+hours+'</td><td'+ec+' style="color:#f0b429;font-weight:700;cursor:pointer;">'+kg+' ק"ג</td><td style="color:#22c55e;font-weight:700;">'+kgH+'</td><td'+ec+'>'+notes+'</td><td style="white-space:nowrap;"><span class="prod-arrow" onclick="toggleEditProdRow(this)" style="display:inline-block;cursor:pointer;color:#94a3b8;font-size:15px;padding:2px 6px;transition:transform 0.2s;user-select:none;vertical-align:middle;" title="ערוך / סגור">▶<\/span><button onclick="delRow(this)" style="background:#dc2626;color:white;border:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;margin-right:2px;" title="מחק">✕<\/button></td>';
+  var locSelectHtml = '<select class="shift-loc-select" style="background:#0a1628;border:1px solid rgba(96,165,250,0.3);border-radius:6px;padding:3px 5px;color:#64748b;font-size:11px;font-family:Heebo,Arial,sans-serif;max-width:115px;cursor:pointer;">'
+    + '<option value="">— מיקום —</option>'
+    + '<option value="מחסן למעלה">↑ מחסן למעלה</option>'
+    + '<option value="מחסן למטה">↓ מחסן למטה</option>'
+    + '<option value="קונטיינר 1">📦 קונטיינר 1</option>'
+    + '<option value="קונטיינר 2">📦 קונטיינר 2</option>'
+    + '</select>';
+  row.innerHTML = '<td'+ec+'>'+dateStr+'</td><td'+ec+'>'+team+'</td><td'+ec+' style="color:#f0b429;font-weight:600;cursor:pointer;">'+product+'</td><td'+ec+'>'+hours+'</td><td'+ec+' style="color:#f0b429;font-weight:700;cursor:pointer;">'+kg+' ק"ג</td><td style="color:#22c55e;font-weight:700;">'+kgH+'</td><td'+ec+'>'+notes+'</td><td>'+locSelectHtml+'</td><td style="white-space:nowrap;"><span class="prod-arrow" onclick="toggleEditProdRow(this)" style="display:inline-block;cursor:pointer;color:#94a3b8;font-size:15px;padding:2px 6px;transition:transform 0.2s;user-select:none;vertical-align:middle;" title="ערוך / סגור">▶<\/span><button onclick="delRow(this)" style="background:#dc2626;color:white;border:none;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;margin-right:2px;" title="מחק">✕<\/button></td>';
+  // שמור מיקום משמרת
+  if (location) {
+    var _sl = JSON.parse(localStorage.getItem(_SHIFT_LOC_KEY) || '{}');
+    _sl[dateStr + '___' + team + '___' + product] = location;
+    localStorage.setItem(_SHIFT_LOC_KEY, JSON.stringify(_sl));
+  }
   ['p-date','p-hours','p-kg','p-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('p-location').value = '';
   var otherInp = document.getElementById('p-product-other'); otherInp.value=''; otherInp.style.display='none';
   recalcProductionKgH();
   syncDashboard();
@@ -6466,6 +6996,7 @@ function doPrintProductionLog() {
 }
 
 function migrateProdRows() {
+  var locs = JSON.parse(localStorage.getItem(_SHIFT_LOC_KEY) || '{}');
   document.querySelectorAll('#production-tbody tr').forEach(function(row) {
     if (row.id === 'prod-empty' || row.classList.contains('edit-prod-row')) return;
     var lastCell = row.cells[row.cells.length - 1];
@@ -6484,7 +7015,28 @@ function migrateProdRows() {
     lastCell.querySelectorAll('button').forEach(function(b){
       if (b.textContent === '✏️') b.remove();
     });
+    // הוסף תא מיקום לשורות ישנות שאין להן (8 תאים במקום 9)
+    if (row.cells.length === 8) {
+      var locCell = row.insertCell(7);
+      var date  = row.cells[0] ? row.cells[0].textContent.trim() : '';
+      var shift = row.cells[1] ? row.cells[1].textContent.trim() : '';
+      var prod  = row.cells[2] ? row.cells[2].textContent.trim() : '';
+      var key   = date + '___' + shift + '___' + prod;
+      var curLoc = locs[key] || '';
+      var sel = document.createElement('select');
+      sel.className = 'shift-loc-select';
+      sel.style.cssText = 'background:#0a1628;border:1px solid rgba(96,165,250,0.3);border-radius:6px;padding:3px 5px;color:'+(curLoc?'#60a5fa':'#64748b')+';font-size:11px;font-family:Heebo,Arial,sans-serif;max-width:115px;cursor:pointer;';
+      ['', 'מחסן למעלה', 'מחסן למטה', 'קונטיינר 1', 'קונטיינר 2'].forEach(function(opt) {
+        var o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt === '' ? '— מיקום —' : (opt === 'מחסן למעלה' ? '↑ מחסן למעלה' : opt === 'מחסן למטה' ? '↓ מחסן למטה' : '📦 ' + opt);
+        if (opt === curLoc) o.selected = true;
+        sel.appendChild(o);
+      });
+      locCell.appendChild(sel);
+    }
   });
+  saveData();
 }
 
 function printSeasonReport() {
@@ -8628,636 +9180,4 @@ function confirmAttendance() {
   var ddmm  = dp[2] + '/' + dp[1];
   var shift = shiftInp ? shiftInp.value : 'א';
 
-  var profiles = (typeof workerProfiles !== 'undefined') ? workerProfiles : {};
-  var entries  = (typeof workerEntries  !== 'undefined') ? workerEntries  : {};
-  var ids = Object.keys(profiles);
-  var saved = 0, absent = 0;
-
-  ids.forEach(function(id) {
-    var cb    = document.getElementById('att-abs-' + id);
-    var inEl  = document.getElementById('att-in-'  + id);
-    var outEl = document.getElementById('att-out-' + id);
-    if (!inEl && !outEl) return;
-
-    var isAbsent = cb && cb.checked;
-    var inTime   = inEl  ? inEl.value.trim()  : '';
-    var outTime  = outEl ? outEl.value.trim() : '';
-    if (!isAbsent && !inTime && !outTime) return;
-
-    var rateEl = document.getElementById('att-rate-' + id);
-    var rateOverride = rateEl && rateEl.value.trim() !== '' ? parseFloat(rateEl.value) : null;
-
-    var shiftEl = document.getElementById('att-shift-' + id);
-    var rowShift = (shiftEl && shiftEl.value !== 'none') ? shiftEl.value : shift;
-
-    if (!entries[id]) entries[id] = [];
-    var entry = {
-      date:  ddmm,
-      shift: rowShift,
-      in:    isAbsent ? 'נעדר' : inTime,
-      out:   isAbsent ? ''     : outTime
-    };
-    if (rateOverride && rateOverride > 0) entry.rateOverride = rateOverride;
-    entries[id].push(entry);
-    if (isAbsent) absent++; else saved++;
-  });
-
-  if (typeof workerEntries !== 'undefined') {
-    for (var k in entries) { if (entries.hasOwnProperty(k)) workerEntries[k] = entries[k]; }
-  }
-  if (typeof saveWorkerEntries === 'function') saveWorkerEntries();
-  if (typeof renderWorkerSection === 'function') renderWorkerSection();
-
-  var msg = 'נשמר ✓\n' + (saved > 0 ? saved + ' עובדים — שעות נרשמו\n' : '') + (absent > 0 ? absent + ' עובדים — סומנו כנעדרים' : '');
-  alert(msg.trim());
-
-  // Clear form
-  ids.forEach(function(id) {
-    var inEl  = document.getElementById('att-in-'  + id);
-    var outEl = document.getElementById('att-out-' + id);
-    var cb    = document.getElementById('att-abs-' + id);
-    var row   = document.getElementById('att-row-' + id);
-    if (inEl)  { inEl.value = '';  inEl.disabled = false;  inEl.style.opacity = '1'; }
-    if (outEl) { outEl.value = ''; outEl.disabled = false; outEl.style.opacity = '1'; }
-    if (cb)    cb.checked = false;
-    if (row)   row.style.opacity = '1';
-    var rEl = document.getElementById('att-rate-' + id);
-    if (rEl) rEl.value = '';
-  });
-  attCountFilled();
-}
-
-// ============================================================
-// MARKETING MODULE
-// ============================================================
-var _MKT_LEADS_KEY    = 'matzah_mkt_leads';
-var _MKT_PARTNERS_KEY = 'matzah_mkt_partners';
-var _MKT_CONTENT_KEY  = 'matzah_mkt_content';
-var mktLeads    = [];
-var mktPartners = [];
-var mktContent  = [];
-
-var _MKT_TEMPLATES = [
-  {
-    name: 'תזכורת פסח',
-    text: 'שלום {שם}! 👋\nנועם מאפיית המצות כאן.\nפסח מתקרב — ממליץ להזמין מוקדם כדי להבטיח את המקום שלך.\nלהזמנות: [הכנס מספר]\nחג כשר ושמח! 🍷'
-  },
-  {
-    name: 'אישור הזמנה',
-    text: 'שלום {שם}! ✅\nהזמנתך התקבלה בהצלחה.\nפרטים: {פרטים}\nתאריך איסוף: {תאריך}\nתודה שבחרת בנו! 🥣'
-  },
-  {
-    name: 'מבצע מיוחד',
-    text: 'שלום {שם}! 🎉\nמבצע מיוחד לחברים:\n{פרטי מבצע}\nבתוקף עד: {תאריך}\nלהזמנות השב להודעה זו.'
-  },
-  {
-    name: 'תזכורת איסוף',
-    text: 'שלום {שם}! ⏰\nתזכורת: ההזמנה שלך מוכנה לאיסוף!\nכתובת: {כתובת}\nשעות: {שעות}\nמחכים לך! 🙏'
-  }
-];
-
-function mktLoad() {
-  try { mktLeads    = JSON.parse(localStorage.getItem(_MKT_LEADS_KEY))    || []; } catch(e) { mktLeads    = []; }
-  try { mktPartners = JSON.parse(localStorage.getItem(_MKT_PARTNERS_KEY)) || []; } catch(e) { mktPartners = []; }
-  try { mktContent  = JSON.parse(localStorage.getItem(_MKT_CONTENT_KEY))  || []; } catch(e) { mktContent  = []; }
-}
-function mktSaveLeads()    { localStorage.setItem(_MKT_LEADS_KEY,    JSON.stringify(mktLeads));    }
-function mktSavePartners() { localStorage.setItem(_MKT_PARTNERS_KEY, JSON.stringify(mktPartners)); }
-function mktSaveContent()  { localStorage.setItem(_MKT_CONTENT_KEY,  JSON.stringify(mktContent));  }
-
-// --- WhatsApp ---
-function mktLoadTemplate() {
-  var sel = document.getElementById('mkt-template-sel');
-  var txt = document.getElementById('mkt-wa-msg');
-  if (!sel || !txt) return;
-  var idx = parseInt(sel.value);
-  if (isNaN(idx) || idx < 0 || idx >= _MKT_TEMPLATES.length) return;
-  txt.value = _MKT_TEMPLATES[idx].text;
-}
-
-function mktCopyMsg() {
-  var txt = document.getElementById('mkt-wa-msg');
-  if (!txt || !txt.value.trim()) { alert('כתוב הודעה קודם'); return; }
-  var btn = document.getElementById('mkt-copy-btn');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(txt.value).then(function() {
-      if (btn) { var orig = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = orig; }, 2000); }
-    });
-  } else {
-    txt.select();
-    document.execCommand('copy');
-    if (btn) { var orig2 = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = orig2; }, 2000); }
-  }
-}
-
-function mktOpenWABusiness() {
-  window.open('https://business.facebook.com/wa/manage/home/', '_blank');
-}
-
-function mktSendWA() {
-  var txt   = document.getElementById('mkt-wa-msg');
-  var phone = document.getElementById('mkt-wa-phone').value.trim().replace(/\D/g, '');
-  if (!txt || !txt.value.trim()) { alert('כתוב הודעה קודם'); return; }
-  if (!phone) { alert('הכנס מספר טלפון'); return; }
-  if (phone.charAt(0) === '0') phone = '972' + phone.substring(1);
-  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(txt.value), '_blank');
-}
-
-// --- Lea
-function mktAddLead() {
-  var name  = document.getElementById('mkt-lead-name').value.trim();
-  var phone = document.getElementById('mkt-lead-phone').value.trim();
-  var src   = document.getElementById('mkt-lead-src').value;
-  var note  = document.getElementById('mkt-lead-note').value.trim();
-  if (!name) { alert('הכנס שם'); return; }
-  mktLoad();
-  mktLeads.push({ id: Date.now(), name: name, phone: phone, src: src, note: note, status: 'חדש', date: new Date().toLocaleDateString('he-IL') });
-  mktSaveLeads();
-  document.getElementById('mkt-lead-name').value  = '';
-  document.getElementById('mkt-lead-phone').value = '';
-  document.getElementById('mkt-lead-note').value  = '';
-  mktRenderLeads();
-  mktRenderStats();
-}
-
-function mktLeadStatus(id, status) {
-  mktLoad();
-  for (var i = 0; i < mktLeads.length; i++) {
-    if (mktLeads[i].id === id) { mktLeads[i].status = status; break; }
-  }
-  mktSaveLeads();
-  mktRenderLeads();
-  mktRenderStats();
-}
-
-function mktDeleteLead(id) {
-  mktLoad();
-  var next = [];
-  for (var i = 0; i < mktLeads.length; i++) { if (mktLeads[i].id !== id) next.push(mktLeads[i]); }
-  mktLeads = next;
-  
-  mktRenderLeads();
-  mktRenderStats();
-}
-
-function mktLeadWA(phone, name) {
-  phone = phone.replace(/\D/g, '');
-  if (phone.charAt(0) === '0') phone = '972' + phone.substring(1);
-  var txt = document.getElementById('mkt-wa-msg');
-  var msg = (txt && txt.value.trim()) ? txt.value.replace('{שם}', name) : 'שלום ' + name + '!';
-  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
-}
-
-function mktRenderLeads() {
-  var tbody = document.getElementById('mkt-leads-tbody');
-  if (!tbody) return;
-  mktLoad();
-  if (!mktLeads.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px;font-family:Heebo,Arial,sans-serif;">אין לידים עדיין</td></tr>';
-    return;
-  }
-  var statusColors = { 'חדש': '#60a5fa', 'בטיפול': '#f0b429', 'הזמין': '#22c55e', 'לא רלוונטי': '#ef4444' };
-  var html = '';
-  for (var i = mktLeads.length - 1; i >= 0; i--) {
-    var l = mktLeads[i];
-    var col = statusColors[l.status] || '#94a3b8';
-    html += '<tr style="border-bottom:1px solid #1e3347;">';
-    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:13px;color:white;">' + l.name + '</td>';
-    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:12px;color:#94a3b8;">' + (l.phone || '—') + '</td>';
-    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:12px;color:#94a3b8;">' + l.src + '</td>';
-    html += '<td style="padding:10px 8px;"><select onchange="mktLeadStatus(' + l.id + ', this.value)" style="background:#0f1923;border:1px solid #2a3a50;border-radius:6px;color:' + col + ';padding:4px 6px;font-family:Heebo,Arial,sans-serif;font-size:12px;direction:rtl;">';
-    var sts = ['חדש', 'בטיפול', 'הזמין', 'לא רלוונטי'];
-    for (var s = 0; s < sts.length; s++) {
-      html += '<option value="' + sts[s] + '"' + (l.status === sts[s] ? ' selected' : '') + '>' + sts[s] + '</option>';
-    }
-    html += '</select></td>';
-    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:11px;color:#64748b;">' + (l.note || '—') + '</td>';
-    html += '<td style="padding:10px 8px;text-align:center;white-space:nowrap;">';
-    if (l.phone) {
-      html += '<span onclick="mktLeadWA(\'' + l.phone.replace(/'/g, '') + '\',\'' + l.name.replace(/'/g, '') + '\')" style="cursor:pointer;font-size:16px;margin-left:8px;" title="שלח WhatsApp">💬</span>';
-    }
-    html += '<span onclick="mktDeleteLead(' + l.id + ')" style="color:#ef4444;cursor:pointer;font-size:14px;" title="מחק">🗑️</span>';
-    html += '</td></tr>';
-  }
-  tbody.innerHTML = html;
-}
-
-// --- Partners ---
-function mktAddPartner() {
-  var name    = document.getElementById('mkt-partner-name').value.trim();
-  var type    = document.getElementById('mkt-partner-type').value;
-  var contact = document.getElementById('mkt-partner-contact').value.trim();
-  var comm    = document.getElementById('mkt-partner-comm').value.trim();
-  if (!name) { alert('הכנס שם'); return; }
-  mktLoad();
-  mktPartners.push({ id: Date.now(), name: name, type: type, contact: contact, comm: comm, date: new Date().toLocaleDateString('he-IL') });
-  mktSavePartners();
-  document.getElementById('mkt-partner-name').value    = '';
-  document.getElementById('mkt-partner-contact').value = '';
-  document.getElementById('mkt-partner-comm').value    = '';
-  mktRenderPartners();
-}
-
-function mktDeletePartner(id) {
-  mktLoad();
-  var next = [];
-  for (var i = 0; i < mktPartners.length; i++) { if (mktPartners[i].id !== id) next.push(mktPartners[i]); }
-  mktPartners = next;
-  mktSavePartners();
-  mktRenderPartners();
-}
-
-function mktRenderPartners() {
-  var list = document.getElementById('mkt-partners-list');
-  if (!list) return;
-  mktLoad();
-  if (!mktPartners.length) {
-    list.innerHTML = '<div style="text-align:center;color:#475569;padding:16px;font-family:Heebo,Arial,sans-serif;font-size:13px;">אין שיתופי פעולה עדיין</div>';
-    return;
-  }
-  var html = '';
-  for (var i = mktPartners.length - 1; i >= 0; i--) {
-    var p = mktPartners[i];
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px;background:#0f1923;border-radius:10px;margin-bottom:8px;">';
-    html += '<div>';
-    html += '<div style="font-weight:700;color:white;font-family:Heebo,Arial,sans-serif;font-size:14px;">' + p.name + ' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(' + p.type + ')</span></div>';
-    var sub = [];
-    if (p.contact) sub.push('📞 ' + p.contact);
-    if (p.comm)    sub.push('עמלה: ' + p.comm + '%');
-    if (sub.length) html += '<div style="font-size:12px;color:#64748b;font-family:Heebo,Arial,sans-serif;margin-top:3px;">' + sub.join('  •  ') + '</div>';
-    html += '</div>';
-    html += '<span onclick="mktDeletePartner(' + p.id + ')" style="color:#ef4444;cursor:pointer;font-size:18px;" title="מחק">🗑️</span>';
-    html += '</div>';
-  }
-  list.innerHTML = html;
-}
-
-// --- Content ---
-function mktAddContent() {
-  var title    = document.getElementById('mkt-content-title').value.trim();
-  var platform = document.getElementById('mkt-content-platform').value;
-  var idea     = document.getElementById('mkt-content-idea').value.trim();
-  if (!title) { alert('הכנס כותרת'); return; }
-  mktLoad();
-  mktContent.push({ id: Date.now(), title: title, platform: platform, idea: idea, status: 'רעיון', date: new Date().toLocaleDateString('he-IL') });
-  mktSaveContent();
-  document.getElementById('mkt-content-title').value = '';
-  document.getElementById('mkt-content-idea').value  = '';
-  mktRenderContent();
-}
-
-function mktContentStatus(id, status) {
-  mktLoad();
-  for (var i = 0; i < mktContent.length; i++) {
-    if (mktContent[i].id === id) { mktContent[i].status = status; break; }
-  }
-  mktSaveContent();
-  mktRenderContent();
-}
-
-function mktDeleteContent(id) {
-  mktLoad();
-  var next = [];
-  for (var i = 0; i < mktContent.length; i++) { if (mktContent[i].id !== id) next.push(mktContent[i]); }
-  mktContent = next;
-  mktSaveContent();
-  mktRenderContent();
-}
-
-function mktRenderContent() {
-  var list = document.getElementById('mkt-content-list');
-  if (!list) return;
-  mktLoad();
-  if (!mktContent.length) {
-    list.innerHTML = '<div style="text-align:center;color:#475569;padding:16px;font-family:Heebo,Arial,sans-serif;font-size:13px;">אין רעיונות עדיין</div>';
-    return;
-  }
-  var platIcons = { 'TikTok': '🎵', 'Instagram': '📷', 'Facebook': '📘', 'WhatsApp': '💬', 'YouTube': '▶️' };
-  var statusColors = { 'רעיון': '#94a3b8', 'בהכנה': '#f0b429', 'פורסם': '#22c55e' };
-  var html = '';
-  for (var i = mktContent.length - 1; i >= 0; i--) {
-    var ct = mktContent[i];
-    var ic  = platIcons[ct.platform]  || '📄';
-    var col = statusColors[ct.status] || '#94a3b8';
-    html += '<div style="padding:12px;background:#0f1923;border-radius:10px;margin-bottom:8px;border-right:3px solid ' + col + ';">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
-    html += '<div style="flex:1;">';
-    html += '<div style="font-weight:700;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;">' + ic + ' ' + ct.title + ' <span style="font-size:11px;color:#64748b;font-weight:400;">' + ct.platform + '</span></div>';
-    if (ct.idea) html += '<div style="font-size:12px;color:#64748b;margin-top:4px;font-family:Heebo,Arial,sans-serif;">' + ct.idea + '</div>';
-    html += '<div style="margin-top:7px;display:flex;gap:8px;align-items:center;">';
-    html += '<select onchange="mktContentStatus(' + ct.id + ', this.value)" style="background:#1a2535;border:1px solid #2a3a50;border-radius:6px;color:' + col + ';padding:3px 7px;font-family:Heebo,Arial,sans-serif;font-size:11px;direction:rtl;">';
-    var cts = ['רעיון', 'בהכנה', 'פורסם'];
-    for (var s = 0; s < cts.length; s++) {
-      html += '<option value="' + cts[s] + '"' + (ct.status === cts[s] ? ' selected' : '') + '>' + cts[s] + '</option>';
-    }
-    html += '</select>';
-    html += '<span style="font-size:11px;color:#475569;">' + ct.date + '</span>';
-    html += '</div></div>';
-    html += '<span onclick="mktDeleteContent(' + ct.id + ')" style="color:#ef4444;cursor:pointer;font-size:16px;margin-right:4px;" title="מחק">🗑️</span>';
-    html += '</div></div>';
-  }
-  list.innerHTML = html;
-}
-
-// --- Stats ---
-function mktRenderStats() {
-  var el = document.getElementById('mkt-stats-box');
-  if (!el) return;
-  mktLoad();
-  var total = mktLeads.length;
-  var newC = 0; var active = 0; var converted = 0;
-  for (var i = 0; i < mktLeads.length; i++) {
-    if (mktLeads[i].status === 'חדש')               newC++;
-    else if (mktLeads[i].status === 'בטיפול') active++;
-    else if (mktLeads[i].status === 'הזמין')       converted++;
-  }
-  var rate = total > 0 ? Math.round(converted / total * 100) : 0;
-  var partners = mktPartners.length;
-  var content  = mktContent.length;
-  el.innerHTML =
-    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">' +
-    _mktStat(total,     '#60a5fa', 'סה"כ לידים') +
-    _mktStat(newC,      '#f0b429', 'חדשים') +
-    _mktStat(converted, '#22c55e', 'הזמינו') +
-    _mktStat(rate + '%','#a78bfa', 'המרה %') +
-    _mktStat(partners,  '#f97316', 'שיתופים') +
-    '</div>';
-}
-
-function _mktStat(val, color, label) {
-  return '<div style="text-align:center;background:#1a2535;border-radius:10px;padding:14px 8px;">' +
-    '<div style="font-size:24px;font-weight:800;color:' + color + ';line-height:1.1;">' + val + '</div>' +
-    '<div style="font-size:10px;color:#94a3b8;font-family:Heebo,Arial,sans-serif;margin-top:4px;">' + label + '</div>' +
-    '</div>';
-}
-
-function mktInit() {
-  mktLoad();
-  mktRenderLeads();
-  mktRenderPartners();
-  mktRenderContent();
-  mktRenderStats();
-}
-// ============================================================
-// BULK WORKER IMPORT
-// ============================================================
-function openBulkImport() {
-  var ov = document.getElementById('bulk-import-overlay');
-  if (ov) { ov.style.display = 'flex'; }
-  setTimeout(function() { var t = document.getElementById('bulk-import-txt'); if (t) t.focus(); }, 100);
-}
-function closeBulkImport() {
-  var ov = document.getElementById('bulk-import-overlay');
-  if (ov) ov.style.display = 'none';
-}
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeBulkImport(); });
-
-function runBulkImport() {
-  var txt = document.getElementById('bulk-import-txt');
-  if (!txt || !txt.value.trim()) { alert('הדבק שמות קודם'); return; }
-  var lines = txt.value.split('\n');
-  var added = 0; var skipped = 0;
-  loadWorkerProfiles();
-  for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].trim();
-    if (!line) continue;
-    var parts = line.split(/[\t,|]+/);
-    var name     = (parts[0] || '').trim();
-    var lastName = (parts[1] || '').trim();
-    var role     = (parts[2] || '').trim() || 'עובד';
-    var rate     = parseFloat((parts[3] || '').trim()) || 0;
-    var phone    = (parts[4] || '').trim().replace(/[-\s]/g, '');
-    if (!name) { skipped++; continue; }
-    var nameParts = name.split(' ');
-    if (nameParts.length > 1 && !lastName) {
-      lastName = nameParts.slice(1).join(' ');
-      name = nameParts[0];
-    }
-    var id = 'w' + nextWorkerId++;
-    workerProfiles[id] = { name: name, lastName: lastName, role: role, rate: rate, phone: phone };
-    added++;
-  }
-  saveWorkerProfiles();
-  txt.value = '';
-  closeBulkImport();
-  renderWorkerSection();
-  alert('✅ יובאו ' + added + ' עובדים בהצלחה' + (skipped ? ' · ' + skipped + ' שורות דולגו' : '') + '.');
-}
-
-// live preview count
-document.addEventListener('input', function(e) {
-  if (e.target && e.target.id === 'bulk-import-txt') {
-    var lines = e.target.value.split('\n').filter(function(l) { return l.trim(); });
-    var prev = document.getElementById('bulk-import-preview');
-    if (prev) prev.textContent = lines.length ? lines.length + ' עובדים יתווספו' : '';
-  }
-});
-
-// ============================================================
-// DATA AGENT
-// ============================================================
-var _agentOpen  = false;
-var _agentTimer = null;
-
-function toggleAgent() {
-  _agentOpen = !_agentOpen;
-  var fab   = document.getElementById('agent-fab');
-  var panel = document.getElementById('agent-panel');
-  if (fab)   fab.classList.toggle('open',   _agentOpen);
-  if (panel) panel.classList.toggle('open', _agentOpen);
-  if (_agentOpen) {
-    agentRefresh();
-    _agentTimer = setInterval(agentRefresh, 8000);
-    setTimeout(function() { var i = document.getElementById('agent-input'); if (i) i.focus(); }, 340);
-  } else {
-    if (_agentTimer) { clearInterval(_agentTimer); _agentTimer = null; }
-  }
-}
-
-function agentCurrentTab() {
-  var tabs = ['dashboard','orders','production','inventory','workers','finance','marketing'];
-  for (var i = 0; i < tabs.length; i++) {
-    var el = document.getElementById('tab-' + tabs[i]);
-    if (el && el.style.display === 'block') return tabs[i];
-  }
-  return 'dashboard';
-}
-
-function agentRefresh() {
-  var box = document.getElementById('agent-insights');
-  if (!box) return;
-  var ins = agentBuildInsights(agentCurrentTab());
-  var html = '';
-  for (var i = 0; i < ins.length; i++) html += '<div class="agent-insight">' + ins[i] + '</div>';
-  box.innerHTML = html;
-}
-
-function _agOrders()   { try { return JSON.parse(localStorage.getItem('matzah_orders'))          || []; } catch(e) { return []; } }
-function _agInv()      { try { return JSON.parse(localStorage.getItem('matzah_inventory'))       || []; } catch(e) { return []; } }
-function _agWorkers()  { try { return JSON.parse(localStorage.getItem('matzah_worker_profiles')) || {}; } catch(e) { return {}; } }
-function _agEntries()  { try { return JSON.parse(localStorage.getItem('matzah_worker_entries'))  || []; } catch(e) { return []; } }
-function _agLeads()    { try { return JSON.parse(localStorage.getItem('matzah_mkt_leads'))       || []; } catch(e) { return []; } }
-function _agPartners() { try { return JSON.parse(localStorage.getItem('matzah_mkt_partners'))    || []; } catch(e) { return []; } }
-function _agContent()  { try { return JSON.parse(localStorage.getItem('matzah_mkt_content'))     || []; } catch(e) { return []; } }
-
-function agentBuildInsights(tab) {
-  var res = [];
-  var now = new Date();
-  var h   = now.getHours();
-  var td  = ('0'+now.getDate()).slice(-2) + '/' + ('0'+(now.getMonth()+1)).slice(-2);
-  var orders = _agOrders(); var inv = _agInv();
-  var workers = _agWorkers(); var entries = _agEntries();
-  var leads = _agLeads();
-
-  if (tab === 'dashboard' || tab === 'orders') {
-    var pend = []; var inP = []; var done = []; var todayD = [];
-    for (var i = 0; i < orders.length; i++) {
-      var o = orders[i];
-      if (o.status === 'ממתין')  pend.push(o);
-      if (o.status === 'בייצור') inP.push(o);
-      if (o.status === 'הושלם')  done.push(o);
-      if (o.deliveryDate && o.deliveryDate.indexOf(td) >= 0) todayD.push(o);
-    }
-    var kg = 0;
-    for (var j = 0; j < pend.length; j++) { var its = pend[j].items||[]; for (var k=0;k<its.length;k++) kg += parseFloat(its[k].kg)||0; }
-    if (!orders.length) { res.push('📦 אין הזמנות עדיין'); }
-    else {
-      res.push('📦 ' + pend.length + ' ממתינות' + (inP.length ? ' · ' + inP.length + ' בייצור' : '') + (done.length ? ' · ' + done.length + ' הושלמו' : ''));
-      if (todayD.length) res.push('🚚 ' + todayD.length + ' משלוחים להיום (' + td + ')');
-      if (kg > 0) res.push('⚖️ ' + kg.toFixed(1) + ' ק"ג בהזמנות פתוחות');
-    }
-  }
-
-  if (tab === 'inventory') {
-    var low = [];
-    for (var ii = 0; ii < inv.length; ii++) { var it = inv[ii]; if (it.status && (it.status.indexOf('נמוך') >= 0 || it.status.indexOf('מחסור') >= 0)) low.push(it); }
-    if (!inv.length) res.push('🌾 אין פריטי מלאי עדיין');
-    else {
-      res.push('🌾 ' + inv.length + ' פריטים רשומים');
-      if (low.length) res.push('⚠️ ' + low.length + ' פריטים דורשים תשומת לב: ' + low.map(function(x){return x.item||x.name||'';}).join(', '));
-      else res.push('✅ כל הפריטים תקינים');
-    }
-  }
-
-  if (tab === 'workers') {
-    var wk = Object.keys(workers).length;
-    var todayE = []; var abs = [];
-    for (var wi = 0; wi < entries.length; wi++) { if (entries[wi].date && entries[wi].date.indexOf(td) >= 0) todayE.push(entries[wi]); }
-    for (var ai = 0; ai < todayE.length; ai++) { if (todayE[ai].in === 'נעדר') abs.push(todayE[ai]); }
-    res.push('👷 ' + wk + ' עובדים רשומים');
-    if (todayE.length) res.push('📋 ' + todayE.length + ' רישומי נוכחות להיום' + (abs.length ? ' · ' + abs.length + ' נעדרים' : ' · הכולם נכחו'));
-    else res.push('📋 טרם נרשמה נוכחות להיום');
-  }
-
-  if (tab === 'marketing') {
-    var newL = []; var conv = [];
-    for (var li = 0; li < leads.length; li++) { if (leads[li].status==='חדש') newL.push(leads[li]); if (leads[li].status==='הזמין') conv.push(leads[li]); }
-    var rate = leads.length ? Math.round(conv.length/leads.length*100) : 0;
-    var pts = _agPartners(); var cnt = _agContent(); var pub = [];
-    for (var ci = 0; ci < cnt.length; ci++) { if (cnt[ci].status==='פורסם') pub.push(cnt[ci]); }
-    if (!leads.length) res.push('🎯 אין לידים עדיין');
-    else { res.push('🎯 ' + leads.length + ' לידים · ' + newL.length + ' חדשים · ' + conv.length + ' הזמינו'); res.push('📊 המרה: ' + rate + '%' + (rate>=30?' 🔥':rate>=15?' 👍':' — יש מקום לשיפור')); }
-    if (pts.length) res.push('🤝 ' + pts.length + ' שיתופי פעולה');
-    if (cnt.length) res.push('📱 ' + cnt.length + ' פוסטים · ' + pub.length + ' פורסמו');
-  }
-
-  if (tab === 'finance') res.push('💰 נתונים פיננסיים — היכנס לטאב הכספים עם קוד גישה');
-  if (tab === 'production') {
-    var inPr = [];
-    for (var pi = 0; pi < orders.length; pi++) { if (orders[pi].status==='בייצור') inPr.push(orders[pi]); }
-    res.push('🏭 ' + inPr.length + ' הזמנות בייצור פעיל כעת');
-  }
-
-  if (h>=5&&h<11) res.push('☀️ בוקר טוב! התחל מהדחוף ביותר');
-  else if (h<15)  res.push('🌤️ צהריים — כדאי לעדכן סטטוסים');
-  else if (h<19)  res.push('🌆 אחה"צ — בדוק מלאי ותכנן מחר');
-  else            res.push('🌙 ערב — סיכום יום טוב');
-  return res;
-}
-
-function agentAsk() {
-  var inp = document.getElementById('agent-input');
-  if (!inp || !inp.value.trim()) return;
-  var q = inp.value.trim(); inp.value = '';
-  var ans = agentAnswer(q);
-  var hist = document.getElementById('agent-history');
-  if (hist) {
-    hist.innerHTML += '<div style="text-align:left;margin:4px 0 2px;"><span style="background:#1e3347;border-radius:8px 8px 8px 2px;padding:5px 10px;font-size:12px;color:#94a3b8;display:inline-block;">' + q + '</span></div><div style="text-align:right;margin-bottom:6px;"><span style="background:rgba(240,180,41,0.1);border:1px solid rgba(240,180,41,0.2);border-radius:8px 8px 2px 8px;padding:5px 10px;font-size:12px;color:#f0b429;display:inline-block;">' + ans + '</span></div>';
-    hist.scrollTop = hist.scrollHeight;
-  }
-}
-
-function agentAnswer(q) {
-  var r = q.toLowerCase();
-  var orders = _agOrders(); var inv = _agInv(); var workers = _agWorkers(); var leads = _agLeads();
-  if (r.indexOf('הזמנ') >= 0) { var p=orders.filter(function(o){return o.status==='ממתין'||o.status==='בייצור';}); return '📦 ' + orders.length + ' הזמנות — ' + p.length + ' פתוחות.'; }
-  if (r.indexOf('מלאי') >= 0 || r.indexOf('סחורה') >= 0) { var lw=inv.filter(function(x){return x.status&&(x.status.indexOf('נמוך')>=0||x.status.indexOf('מחסור')>=0);}); return '🌾 ' + inv.length + ' פריטים' + (lw.length?' · ⚠️ '+lw.length+' בחוסר.':' · הכל ✅'); }
-  if (r.indexOf('עובד') >= 0) return '👷 ' + Object.keys(workers).length + ' עובדים רשומים.';
-  if (r.indexOf('ליד') >= 0 || r.indexOf('לקוח') >= 0) { var cv=leads.filter(function(l){return l.status==='הזמין';}); return '🎯 ' + leads.length + ' לידים · ' + cv.length + ' הזמינו (' + (leads.length?Math.round(cv.length/leads.length*100):0) + '%).'; }
-  if (r.indexOf('שלום') >= 0 || r.indexOf('היי') >= 0) return 'שלום! 🤖 שאל על: הזמנות / מלאי / עובדים / לידים';
-  if (r.indexOf('תודה') >= 0) return 'בשמחה! 😊';
-  if (r.indexOf('עזר') >= 0 || r.indexOf('מה אתה') >= 0) return '💡 אני קורא נתונים בזמן אמת מהמערכת. שאל על: הזמנות · מלאי · עובדים · לידים';
-  return '🤔 נסה: הזמנות / מלאי / עובדים / לידים';
-}
-
-function mktCopyLandingLink() {
-  var url = window.location.href.replace(/[^/]*$/, '') + 'marketing_landing.html';
-  var btn = document.getElementById('mkt-copy-link-btn');
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(function() {
-      if (btn) { var o = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = o; }, 2000); }
-    });
-  } else {
-    var ta = document.createElement('textarea'); ta.value = url;
-    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    if (btn) { var o2 = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = o2; }, 2000); }
-  }
-}
-</script>
-
-<input type="date" id="global-date-picker" style="position:fixed;opacity:0;pointer-events:none;width:0;height:0;" onchange="jumpToDate(this.value)">
-
-<!-- ===== BULK IMPORT MODAL ===== -->
-<div id="bulk-import-overlay" onclick="if(event.target===this)closeBulkImport()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-  <div style="background:#1a2535;border:1px solid rgba(240,180,41,0.3);border-radius:18px;padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.7);">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
-      <div style="font-size:17px;font-weight:800;color:#f0b429;font-family:Heebo,Arial,sans-serif;">👥 ייבוא עובדים מרובה</div>
-      <button onclick="closeBulkImport()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;">×</button>
-    </div>
-    <div style="font-size:13px;color:#94a3b8;font-family:Heebo,Arial,sans-serif;margin-bottom:6px;line-height:1.6;">
-      הדבק שמות מ-Excel או רשום שם בכל שורה.<br>
-      <span style="color:#f0b429;">אפשר גם:</span> שם | שם משפחה | תפקיד | שכר/שעה | טלפון — מופרדים בטאב או פסיק
-    </div>
-    <div style="font-size:11px;color:#475569;font-family:Heebo,Arial,sans-serif;margin-bottom:12px;">
-      דוגמה: <span style="color:#60a5fa;">ישראל ישראלי | אופה | 45 | 0501234567</span>
-    </div>
-    <textarea id="bulk-import-txt" rows="12" placeholder="שם פרטי&#10;ישראל ישראלי&#10;מוחמד עלי | מחסנאי | 40&#10;..." style="width:100%;background:#0f1923;border:1px solid #2a3a50;border-radius:10px;padding:12px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;direction:rtl;resize:vertical;outline:none;box-sizing:border-box;margin-bottom:12px;line-height:1.7;"></textarea>
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <div id="bulk-import-preview" style="font-size:12px;color:#64748b;font-family:Heebo,Arial,sans-serif;"></div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="closeBulkImport()" style="background:rgba(255,255,255,0.06);border:1px solid #2a3a50;color:#94a3b8;border-radius:8px;padding:9px 20px;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">ביטול</button>
-        <button onclick="runBulkImport()" style="background:linear-gradient(135deg,#f0b429,#d97706);color:#0a1628;border:none;border-radius:8px;padding:9px 24px;font-weight:800;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✓ ייבא עובדים</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== DATA AGENT ===== -->
-<div id="agent-fab" onclick="toggleAgent()" title="סוכן נתונים" style="display:none;">🤖</div>
-<div id="agent-panel">
-  <div id="agent-panel-header">
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span>🤖 סוכן נתונים</span>
-      <span style="font-size:10px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.5);color:#22c55e;border-radius:100px;padding:2px 8px;font-weight:700;">● חי</span>
-    </div>
-    <button onclick="toggleAgent()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;line-height:1;padding:0 2px;">×</button>
-  </div>
-  <div id="agent-insights"></div>
-  <div id="agent-history"></div>
-  <div id="agent-input-row">
-    <input id="agent-input" type="text" placeholder="שאל שאלה על העסק..." onkeydown="if(event.key==='Enter')agentAsk()">
-    <button id="agent-send-btn" onclick="agentAsk()">שלח</button>
-  </div>
-</div>
-</body>
-</html>
+  var profiles = (type

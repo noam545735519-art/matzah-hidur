@@ -9180,4 +9180,636 @@ function confirmAttendance() {
   var ddmm  = dp[2] + '/' + dp[1];
   var shift = shiftInp ? shiftInp.value : 'א';
 
-  var profiles = (type
+  var profiles = (typeof workerProfiles !== 'undefined') ? workerProfiles : {};
+  var entries  = (typeof workerEntries  !== 'undefined') ? workerEntries  : {};
+  var ids = Object.keys(profiles);
+  var saved = 0, absent = 0;
+
+  ids.forEach(function(id) {
+    var cb    = document.getElementById('att-abs-' + id);
+    var inEl  = document.getElementById('att-in-'  + id);
+    var outEl = document.getElementById('att-out-' + id);
+    if (!inEl && !outEl) return;
+
+    var isAbsent = cb && cb.checked;
+    var inTime   = inEl  ? inEl.value.trim()  : '';
+    var outTime  = outEl ? outEl.value.trim() : '';
+    if (!isAbsent && !inTime && !outTime) return;
+
+    var rateEl = document.getElementById('att-rate-' + id);
+    var rateOverride = rateEl && rateEl.value.trim() !== '' ? parseFloat(rateEl.value) : null;
+
+    var shiftEl = document.getElementById('att-shift-' + id);
+    var rowShift = (shiftEl && shiftEl.value !== 'none') ? shiftEl.value : shift;
+
+    if (!entries[id]) entries[id] = [];
+    var entry = {
+      date:  ddmm,
+      shift: rowShift,
+      in:    isAbsent ? 'נעדר' : inTime,
+      out:   isAbsent ? ''     : outTime
+    };
+    if (rateOverride && rateOverride > 0) entry.rateOverride = rateOverride;
+    entries[id].push(entry);
+    if (isAbsent) absent++; else saved++;
+  });
+
+  if (typeof workerEntries !== 'undefined') {
+    for (var k in entries) { if (entries.hasOwnProperty(k)) workerEntries[k] = entries[k]; }
+  }
+  if (typeof saveWorkerEntries === 'function') saveWorkerEntries();
+  if (typeof renderWorkerSection === 'function') renderWorkerSection();
+
+  var msg = 'נשמר ✓\n' + (saved > 0 ? saved + ' עובדים — שעות נרשמו\n' : '') + (absent > 0 ? absent + ' עובדים — סומנו כנעדרים' : '');
+  alert(msg.trim());
+
+  // Clear form
+  ids.forEach(function(id) {
+    var inEl  = document.getElementById('att-in-'  + id);
+    var outEl = document.getElementById('att-out-' + id);
+    var cb    = document.getElementById('att-abs-' + id);
+    var row   = document.getElementById('att-row-' + id);
+    if (inEl)  { inEl.value = '';  inEl.disabled = false;  inEl.style.opacity = '1'; }
+    if (outEl) { outEl.value = ''; outEl.disabled = false; outEl.style.opacity = '1'; }
+    if (cb)    cb.checked = false;
+    if (row)   row.style.opacity = '1';
+    var rEl = document.getElementById('att-rate-' + id);
+    if (rEl) rEl.value = '';
+  });
+  attCountFilled();
+}
+
+// ============================================================
+// MARKETING MODULE
+// ============================================================
+var _MKT_LEADS_KEY    = 'matzah_mkt_leads';
+var _MKT_PARTNERS_KEY = 'matzah_mkt_partners';
+var _MKT_CONTENT_KEY  = 'matzah_mkt_content';
+var mktLeads    = [];
+var mktPartners = [];
+var mktContent  = [];
+
+var _MKT_TEMPLATES = [
+  {
+    name: 'תזכורת פסח',
+    text: 'שלום {שם}! 👋\nנועם מאפיית המצות כאן.\nפסח מתקרב — ממליץ להזמין מוקדם כדי להבטיח את המקום שלך.\nלהזמנות: [הכנס מספר]\nחג כשר ושמח! 🍷'
+  },
+  {
+    name: 'אישור הזמנה',
+    text: 'שלום {שם}! ✅\nהזמנתך התקבלה בהצלחה.\nפרטים: {פרטים}\nתאריך איסוף: {תאריך}\nתודה שבחרת בנו! 🥣'
+  },
+  {
+    name: 'מבצע מיוחד',
+    text: 'שלום {שם}! 🎉\nמבצע מיוחד לחברים:\n{פרטי מבצע}\nבתוקף עד: {תאריך}\nלהזמנות השב להודעה זו.'
+  },
+  {
+    name: 'תזכורת איסוף',
+    text: 'שלום {שם}! ⏰\nתזכורת: ההזמנה שלך מוכנה לאיסוף!\nכתובת: {כתובת}\nשעות: {שעות}\nמחכים לך! 🙏'
+  }
+];
+
+function mktLoad() {
+  try { mktLeads    = JSON.parse(localStorage.getItem(_MKT_LEADS_KEY))    || []; } catch(e) { mktLeads    = []; }
+  try { mktPartners = JSON.parse(localStorage.getItem(_MKT_PARTNERS_KEY)) || []; } catch(e) { mktPartners = []; }
+  try { mktContent  = JSON.parse(localStorage.getItem(_MKT_CONTENT_KEY))  || []; } catch(e) { mktContent  = []; }
+}
+function mktSaveLeads()    { localStorage.setItem(_MKT_LEADS_KEY,    JSON.stringify(mktLeads));    }
+function mktSavePartners() { localStorage.setItem(_MKT_PARTNERS_KEY, JSON.stringify(mktPartners)); }
+function mktSaveContent()  { localStorage.setItem(_MKT_CONTENT_KEY,  JSON.stringify(mktContent));  }
+
+// --- WhatsApp ---
+function mktLoadTemplate() {
+  var sel = document.getElementById('mkt-template-sel');
+  var txt = document.getElementById('mkt-wa-msg');
+  if (!sel || !txt) return;
+  var idx = parseInt(sel.value);
+  if (isNaN(idx) || idx < 0 || idx >= _MKT_TEMPLATES.length) return;
+  txt.value = _MKT_TEMPLATES[idx].text;
+}
+
+function mktCopyMsg() {
+  var txt = document.getElementById('mkt-wa-msg');
+  if (!txt || !txt.value.trim()) { alert('כתוב הודעה קודם'); return; }
+  var btn = document.getElementById('mkt-copy-btn');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt.value).then(function() {
+      if (btn) { var orig = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = orig; }, 2000); }
+    });
+  } else {
+    txt.select();
+    document.execCommand('copy');
+    if (btn) { var orig2 = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = orig2; }, 2000); }
+  }
+}
+
+function mktOpenWABusiness() {
+  window.open('https://business.facebook.com/wa/manage/home/', '_blank');
+}
+
+function mktSendWA() {
+  var txt   = document.getElementById('mkt-wa-msg');
+  var phone = document.getElementById('mkt-wa-phone').value.trim().replace(/\D/g, '');
+  if (!txt || !txt.value.trim()) { alert('כתוב הודעה קודם'); return; }
+  if (!phone) { alert('הכנס מספר טלפון'); return; }
+  if (phone.charAt(0) === '0') phone = '972' + phone.substring(1);
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(txt.value), '_blank');
+}
+
+// --- Leads ---
+function mktAddLead() {
+  var name  = document.getElementById('mkt-lead-name').value.trim();
+  var phone = document.getElementById('mkt-lead-phone').value.trim();
+  var src   = document.getElementById('mkt-lead-src').value;
+  var note  = document.getElementById('mkt-lead-note').value.trim();
+  if (!name) { alert('הכנס שם'); return; }
+  mktLoad();
+  mktLeads.push({ id: Date.now(), name: name, phone: phone, src: src, note: note, status: 'חדש', date: new Date().toLocaleDateString('he-IL') });
+  mktSaveLeads();
+  document.getElementById('mkt-lead-name').value  = '';
+  document.getElementById('mkt-lead-phone').value = '';
+  document.getElementById('mkt-lead-note').value  = '';
+  mktRenderLeads();
+  mktRenderStats();
+}
+
+function mktLeadStatus(id, status) {
+  mktLoad();
+  for (var i = 0; i < mktLeads.length; i++) {
+    if (mktLeads[i].id === id) { mktLeads[i].status = status; break; }
+  }
+  mktSaveLeads();
+  mktRenderLeads();
+  mktRenderStats();
+}
+
+function mktDeleteLead(id) {
+  mktLoad();
+  var next = [];
+  for (var i = 0; i < mktLeads.length; i++) { if (mktLeads[i].id !== id) next.push(mktLeads[i]); }
+  mktLeads = next;
+  mktSaveLeads();
+  mktRenderLeads();
+  mktRenderStats();
+}
+
+function mktLeadWA(phone, name) {
+  phone = phone.replace(/\D/g, '');
+  if (phone.charAt(0) === '0') phone = '972' + phone.substring(1);
+  var txt = document.getElementById('mkt-wa-msg');
+  var msg = (txt && txt.value.trim()) ? txt.value.replace('{שם}', name) : 'שלום ' + name + '!';
+  window.open('https://wa.me/' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+}
+
+function mktRenderLeads() {
+  var tbody = document.getElementById('mkt-leads-tbody');
+  if (!tbody) return;
+  mktLoad();
+  if (!mktLeads.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#475569;padding:20px;font-family:Heebo,Arial,sans-serif;">אין לידים עדיין</td></tr>';
+    return;
+  }
+  var statusColors = { 'חדש': '#60a5fa', 'בטיפול': '#f0b429', 'הזמין': '#22c55e', 'לא רלוונטי': '#ef4444' };
+  var html = '';
+  for (var i = mktLeads.length - 1; i >= 0; i--) {
+    var l = mktLeads[i];
+    var col = statusColors[l.status] || '#94a3b8';
+    html += '<tr style="border-bottom:1px solid #1e3347;">';
+    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:13px;color:white;">' + l.name + '</td>';
+    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:12px;color:#94a3b8;">' + (l.phone || '—') + '</td>';
+    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:12px;color:#94a3b8;">' + l.src + '</td>';
+    html += '<td style="padding:10px 8px;"><select onchange="mktLeadStatus(' + l.id + ', this.value)" style="background:#0f1923;border:1px solid #2a3a50;border-radius:6px;color:' + col + ';padding:4px 6px;font-family:Heebo,Arial,sans-serif;font-size:12px;direction:rtl;">';
+    var sts = ['חדש', 'בטיפול', 'הזמין', 'לא רלוונטי'];
+    for (var s = 0; s < sts.length; s++) {
+      html += '<option value="' + sts[s] + '"' + (l.status === sts[s] ? ' selected' : '') + '>' + sts[s] + '</option>';
+    }
+    html += '</select></td>';
+    html += '<td style="padding:10px 8px;font-family:Heebo,Arial,sans-serif;font-size:11px;color:#64748b;">' + (l.note || '—') + '</td>';
+    html += '<td style="padding:10px 8px;text-align:center;white-space:nowrap;">';
+    if (l.phone) {
+      html += '<span onclick="mktLeadWA(\'' + l.phone.replace(/'/g, '') + '\',\'' + l.name.replace(/'/g, '') + '\')" style="cursor:pointer;font-size:16px;margin-left:8px;" title="שלח WhatsApp">💬</span>';
+    }
+    html += '<span onclick="mktDeleteLead(' + l.id + ')" style="color:#ef4444;cursor:pointer;font-size:14px;" title="מחק">🗑️</span>';
+    html += '</td></tr>';
+  }
+  tbody.innerHTML = html;
+}
+
+// --- Partners ---
+function mktAddPartner() {
+  var name    = document.getElementById('mkt-partner-name').value.trim();
+  var type    = document.getElementById('mkt-partner-type').value;
+  var contact = document.getElementById('mkt-partner-contact').value.trim();
+  var comm    = document.getElementById('mkt-partner-comm').value.trim();
+  if (!name) { alert('הכנס שם'); return; }
+  mktLoad();
+  mktPartners.push({ id: Date.now(), name: name, type: type, contact: contact, comm: comm, date: new Date().toLocaleDateString('he-IL') });
+  mktSavePartners();
+  document.getElementById('mkt-partner-name').value    = '';
+  document.getElementById('mkt-partner-contact').value = '';
+  document.getElementById('mkt-partner-comm').value    = '';
+  mktRenderPartners();
+}
+
+function mktDeletePartner(id) {
+  mktLoad();
+  var next = [];
+  for (var i = 0; i < mktPartners.length; i++) { if (mktPartners[i].id !== id) next.push(mktPartners[i]); }
+  mktPartners = next;
+  mktSavePartners();
+  mktRenderPartners();
+}
+
+function mktRenderPartners() {
+  var list = document.getElementById('mkt-partners-list');
+  if (!list) return;
+  mktLoad();
+  if (!mktPartners.length) {
+    list.innerHTML = '<div style="text-align:center;color:#475569;padding:16px;font-family:Heebo,Arial,sans-serif;font-size:13px;">אין שיתופי פעולה עדיין</div>';
+    return;
+  }
+  var html = '';
+  for (var i = mktPartners.length - 1; i >= 0; i--) {
+    var p = mktPartners[i];
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px;background:#0f1923;border-radius:10px;margin-bottom:8px;">';
+    html += '<div>';
+    html += '<div style="font-weight:700;color:white;font-family:Heebo,Arial,sans-serif;font-size:14px;">' + p.name + ' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(' + p.type + ')</span></div>';
+    var sub = [];
+    if (p.contact) sub.push('📞 ' + p.contact);
+    if (p.comm)    sub.push('עמלה: ' + p.comm + '%');
+    if (sub.length) html += '<div style="font-size:12px;color:#64748b;font-family:Heebo,Arial,sans-serif;margin-top:3px;">' + sub.join('  •  ') + '</div>';
+    html += '</div>';
+    html += '<span onclick="mktDeletePartner(' + p.id + ')" style="color:#ef4444;cursor:pointer;font-size:18px;" title="מחק">🗑️</span>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+
+// --- Content ---
+function mktAddContent() {
+  var title    = document.getElementById('mkt-content-title').value.trim();
+  var platform = document.getElementById('mkt-content-platform').value;
+  var idea     = document.getElementById('mkt-content-idea').value.trim();
+  if (!title) { alert('הכנס כותרת'); return; }
+  mktLoad();
+  mktContent.push({ id: Date.now(), title: title, platform: platform, idea: idea, status: 'רעיון', date: new Date().toLocaleDateString('he-IL') });
+  mktSaveContent();
+  document.getElementById('mkt-content-title').value = '';
+  document.getElementById('mkt-content-idea').value  = '';
+  mktRenderContent();
+}
+
+function mktContentStatus(id, status) {
+  mktLoad();
+  for (var i = 0; i < mktContent.length; i++) {
+    if (mktContent[i].id === id) { mktContent[i].status = status; break; }
+  }
+  mktSaveContent();
+  mktRenderContent();
+}
+
+function mktDeleteContent(id) {
+  mktLoad();
+  var next = [];
+  for (var i = 0; i < mktContent.length; i++) { if (mktContent[i].id !== id) next.push(mktContent[i]); }
+  mktContent = next;
+  mktSaveContent();
+  mktRenderContent();
+}
+
+function mktRenderContent() {
+  var list = document.getElementById('mkt-content-list');
+  if (!list) return;
+  mktLoad();
+  if (!mktContent.length) {
+    list.innerHTML = '<div style="text-align:center;color:#475569;padding:16px;font-family:Heebo,Arial,sans-serif;font-size:13px;">אין רעיונות עדיין</div>';
+    return;
+  }
+  var platIcons = { 'TikTok': '🎵', 'Instagram': '📷', 'Facebook': '📘', 'WhatsApp': '💬', 'YouTube': '▶️' };
+  var statusColors = { 'רעיון': '#94a3b8', 'בהכנה': '#f0b429', 'פורסם': '#22c55e' };
+  var html = '';
+  for (var i = mktContent.length - 1; i >= 0; i--) {
+    var ct = mktContent[i];
+    var ic  = platIcons[ct.platform]  || '📄';
+    var col = statusColors[ct.status] || '#94a3b8';
+    html += '<div style="padding:12px;background:#0f1923;border-radius:10px;margin-bottom:8px;border-right:3px solid ' + col + ';">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;">';
+    html += '<div style="flex:1;">';
+    html += '<div style="font-weight:700;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;">' + ic + ' ' + ct.title + ' <span style="font-size:11px;color:#64748b;font-weight:400;">' + ct.platform + '</span></div>';
+    if (ct.idea) html += '<div style="font-size:12px;color:#64748b;margin-top:4px;font-family:Heebo,Arial,sans-serif;">' + ct.idea + '</div>';
+    html += '<div style="margin-top:7px;display:flex;gap:8px;align-items:center;">';
+    html += '<select onchange="mktContentStatus(' + ct.id + ', this.value)" style="background:#1a2535;border:1px solid #2a3a50;border-radius:6px;color:' + col + ';padding:3px 7px;font-family:Heebo,Arial,sans-serif;font-size:11px;direction:rtl;">';
+    var cts = ['רעיון', 'בהכנה', 'פורסם'];
+    for (var s = 0; s < cts.length; s++) {
+      html += '<option value="' + cts[s] + '"' + (ct.status === cts[s] ? ' selected' : '') + '>' + cts[s] + '</option>';
+    }
+    html += '</select>';
+    html += '<span style="font-size:11px;color:#475569;">' + ct.date + '</span>';
+    html += '</div></div>';
+    html += '<span onclick="mktDeleteContent(' + ct.id + ')" style="color:#ef4444;cursor:pointer;font-size:16px;margin-right:4px;" title="מחק">🗑️</span>';
+    html += '</div></div>';
+  }
+  list.innerHTML = html;
+}
+
+// --- Stats ---
+function mktRenderStats() {
+  var el = document.getElementById('mkt-stats-box');
+  if (!el) return;
+  mktLoad();
+  var total = mktLeads.length;
+  var newC = 0; var active = 0; var converted = 0;
+  for (var i = 0; i < mktLeads.length; i++) {
+    if (mktLeads[i].status === 'חדש')               newC++;
+    else if (mktLeads[i].status === 'בטיפול') active++;
+    else if (mktLeads[i].status === 'הזמין')       converted++;
+  }
+  var rate = total > 0 ? Math.round(converted / total * 100) : 0;
+  var partners = mktPartners.length;
+  var content  = mktContent.length;
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">' +
+    _mktStat(total,     '#60a5fa', 'סה"כ לידים') +
+    _mktStat(newC,      '#f0b429', 'חדשים') +
+    _mktStat(converted, '#22c55e', 'הזמינו') +
+    _mktStat(rate + '%','#a78bfa', 'המרה %') +
+    _mktStat(partners,  '#f97316', 'שיתופים') +
+    '</div>';
+}
+
+function _mktStat(val, color, label) {
+  return '<div style="text-align:center;background:#1a2535;border-radius:10px;padding:14px 8px;">' +
+    '<div style="font-size:24px;font-weight:800;color:' + color + ';line-height:1.1;">' + val + '</div>' +
+    '<div style="font-size:10px;color:#94a3b8;font-family:Heebo,Arial,sans-serif;margin-top:4px;">' + label + '</div>' +
+    '</div>';
+}
+
+function mktInit() {
+  mktLoad();
+  mktRenderLeads();
+  mktRenderPartners();
+  mktRenderContent();
+  mktRenderStats();
+}
+// ============================================================
+// BULK WORKER IMPORT
+// ============================================================
+function openBulkImport() {
+  var ov = document.getElementById('bulk-import-overlay');
+  if (ov) { ov.style.display = 'flex'; }
+  setTimeout(function() { var t = document.getElementById('bulk-import-txt'); if (t) t.focus(); }, 100);
+}
+function closeBulkImport() {
+  var ov = document.getElementById('bulk-import-overlay');
+  if (ov) ov.style.display = 'none';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeBulkImport(); });
+
+function runBulkImport() {
+  var txt = document.getElementById('bulk-import-txt');
+  if (!txt || !txt.value.trim()) { alert('הדבק שמות קודם'); return; }
+  var lines = txt.value.split('\n');
+  var added = 0; var skipped = 0;
+  loadWorkerProfiles();
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].trim();
+    if (!line) continue;
+    var parts = line.split(/[\t,|]+/);
+    var name     = (parts[0] || '').trim();
+    var lastName = (parts[1] || '').trim();
+    var role     = (parts[2] || '').trim() || 'עובד';
+    var rate     = parseFloat((parts[3] || '').trim()) || 0;
+    var phone    = (parts[4] || '').trim().replace(/[-\s]/g, '');
+    if (!name) { skipped++; continue; }
+    var nameParts = name.split(' ');
+    if (nameParts.length > 1 && !lastName) {
+      lastName = nameParts.slice(1).join(' ');
+      name = nameParts[0];
+    }
+    var id = 'w' + nextWorkerId++;
+    workerProfiles[id] = { name: name, lastName: lastName, role: role, rate: rate, phone: phone };
+    added++;
+  }
+  saveWorkerProfiles();
+  txt.value = '';
+  closeBulkImport();
+  renderWorkerSection();
+  alert('✅ יובאו ' + added + ' עובדים בהצלחה' + (skipped ? ' · ' + skipped + ' שורות דולגו' : '') + '.');
+}
+
+// live preview count
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'bulk-import-txt') {
+    var lines = e.target.value.split('\n').filter(function(l) { return l.trim(); });
+    var prev = document.getElementById('bulk-import-preview');
+    if (prev) prev.textContent = lines.length ? lines.length + ' עובדים יתווספו' : '';
+  }
+});
+
+// ============================================================
+// DATA AGENT
+// ============================================================
+var _agentOpen  = false;
+var _agentTimer = null;
+
+function toggleAgent() {
+  _agentOpen = !_agentOpen;
+  var fab   = document.getElementById('agent-fab');
+  var panel = document.getElementById('agent-panel');
+  if (fab)   fab.classList.toggle('open',   _agentOpen);
+  if (panel) panel.classList.toggle('open', _agentOpen);
+  if (_agentOpen) {
+    agentRefresh();
+    _agentTimer = setInterval(agentRefresh, 8000);
+    setTimeout(function() { var i = document.getElementById('agent-input'); if (i) i.focus(); }, 340);
+  } else {
+    if (_agentTimer) { clearInterval(_agentTimer); _agentTimer = null; }
+  }
+}
+
+function agentCurrentTab() {
+  var tabs = ['dashboard','orders','production','inventory','workers','finance','marketing'];
+  for (var i = 0; i < tabs.length; i++) {
+    var el = document.getElementById('tab-' + tabs[i]);
+    if (el && el.style.display === 'block') return tabs[i];
+  }
+  return 'dashboard';
+}
+
+function agentRefresh() {
+  var box = document.getElementById('agent-insights');
+  if (!box) return;
+  var ins = agentBuildInsights(agentCurrentTab());
+  var html = '';
+  for (var i = 0; i < ins.length; i++) html += '<div class="agent-insight">' + ins[i] + '</div>';
+  box.innerHTML = html;
+}
+
+function _agOrders()   { try { return JSON.parse(localStorage.getItem('matzah_orders'))          || []; } catch(e) { return []; } }
+function _agInv()      { try { return JSON.parse(localStorage.getItem('matzah_inventory'))       || []; } catch(e) { return []; } }
+function _agWorkers()  { try { return JSON.parse(localStorage.getItem('matzah_worker_profiles')) || {}; } catch(e) { return {}; } }
+function _agEntries()  { try { return JSON.parse(localStorage.getItem('matzah_worker_entries'))  || []; } catch(e) { return []; } }
+function _agLeads()    { try { return JSON.parse(localStorage.getItem('matzah_mkt_leads'))       || []; } catch(e) { return []; } }
+function _agPartners() { try { return JSON.parse(localStorage.getItem('matzah_mkt_partners'))    || []; } catch(e) { return []; } }
+function _agContent()  { try { return JSON.parse(localStorage.getItem('matzah_mkt_content'))     || []; } catch(e) { return []; } }
+
+function agentBuildInsights(tab) {
+  var res = [];
+  var now = new Date();
+  var h   = now.getHours();
+  var td  = ('0'+now.getDate()).slice(-2) + '/' + ('0'+(now.getMonth()+1)).slice(-2);
+  var orders = _agOrders(); var inv = _agInv();
+  var workers = _agWorkers(); var entries = _agEntries();
+  var leads = _agLeads();
+
+  if (tab === 'dashboard' || tab === 'orders') {
+    var pend = []; var inP = []; var done = []; var todayD = [];
+    for (var i = 0; i < orders.length; i++) {
+      var o = orders[i];
+      if (o.status === 'ממתין')  pend.push(o);
+      if (o.status === 'בייצור') inP.push(o);
+      if (o.status === 'הושלם')  done.push(o);
+      if (o.deliveryDate && o.deliveryDate.indexOf(td) >= 0) todayD.push(o);
+    }
+    var kg = 0;
+    for (var j = 0; j < pend.length; j++) { var its = pend[j].items||[]; for (var k=0;k<its.length;k++) kg += parseFloat(its[k].kg)||0; }
+    if (!orders.length) { res.push('📦 אין הזמנות עדיין'); }
+    else {
+      res.push('📦 ' + pend.length + ' ממתינות' + (inP.length ? ' · ' + inP.length + ' בייצור' : '') + (done.length ? ' · ' + done.length + ' הושלמו' : ''));
+      if (todayD.length) res.push('🚚 ' + todayD.length + ' משלוחים להיום (' + td + ')');
+      if (kg > 0) res.push('⚖️ ' + kg.toFixed(1) + ' ק"ג בהזמנות פתוחות');
+    }
+  }
+
+  if (tab === 'inventory') {
+    var low = [];
+    for (var ii = 0; ii < inv.length; ii++) { var it = inv[ii]; if (it.status && (it.status.indexOf('נמוך') >= 0 || it.status.indexOf('מחסור') >= 0)) low.push(it); }
+    if (!inv.length) res.push('🌾 אין פריטי מלאי עדיין');
+    else {
+      res.push('🌾 ' + inv.length + ' פריטים רשומים');
+      if (low.length) res.push('⚠️ ' + low.length + ' פריטים דורשים תשומת לב: ' + low.map(function(x){return x.item||x.name||'';}).join(', '));
+      else res.push('✅ כל הפריטים תקינים');
+    }
+  }
+
+  if (tab === 'workers') {
+    var wk = Object.keys(workers).length;
+    var todayE = []; var abs = [];
+    for (var wi = 0; wi < entries.length; wi++) { if (entries[wi].date && entries[wi].date.indexOf(td) >= 0) todayE.push(entries[wi]); }
+    for (var ai = 0; ai < todayE.length; ai++) { if (todayE[ai].in === 'נעדר') abs.push(todayE[ai]); }
+    res.push('👷 ' + wk + ' עובדים רשומים');
+    if (todayE.length) res.push('📋 ' + todayE.length + ' רישומי נוכחות להיום' + (abs.length ? ' · ' + abs.length + ' נעדרים' : ' · הכולם נכחו'));
+    else res.push('📋 טרם נרשמה נוכחות להיום');
+  }
+
+  if (tab === 'marketing') {
+    var newL = []; var conv = [];
+    for (var li = 0; li < leads.length; li++) { if (leads[li].status==='חדש') newL.push(leads[li]); if (leads[li].status==='הזמין') conv.push(leads[li]); }
+    var rate = leads.length ? Math.round(conv.length/leads.length*100) : 0;
+    var pts = _agPartners(); var cnt = _agContent(); var pub = [];
+    for (var ci = 0; ci < cnt.length; ci++) { if (cnt[ci].status==='פורסם') pub.push(cnt[ci]); }
+    if (!leads.length) res.push('🎯 אין לידים עדיין');
+    else { res.push('🎯 ' + leads.length + ' לידים · ' + newL.length + ' חדשים · ' + conv.length + ' הזמינו'); res.push('📊 המרה: ' + rate + '%' + (rate>=30?' 🔥':rate>=15?' 👍':' — יש מקום לשיפור')); }
+    if (pts.length) res.push('🤝 ' + pts.length + ' שיתופי פעולה');
+    if (cnt.length) res.push('📱 ' + cnt.length + ' פוסטים · ' + pub.length + ' פורסמו');
+  }
+
+  if (tab === 'finance') res.push('💰 נתונים פיננסיים — היכנס לטאב הכספים עם קוד גישה');
+  if (tab === 'production') {
+    var inPr = [];
+    for (var pi = 0; pi < orders.length; pi++) { if (orders[pi].status==='בייצור') inPr.push(orders[pi]); }
+    res.push('🏭 ' + inPr.length + ' הזמנות בייצור פעיל כעת');
+  }
+
+  if (h>=5&&h<11) res.push('☀️ בוקר טוב! התחל מהדחוף ביותר');
+  else if (h<15)  res.push('🌤️ צהריים — כדאי לעדכן סטטוסים');
+  else if (h<19)  res.push('🌆 אחה"צ — בדוק מלאי ותכנן מחר');
+  else            res.push('🌙 ערב — סיכום יום טוב');
+  return res;
+}
+
+function agentAsk() {
+  var inp = document.getElementById('agent-input');
+  if (!inp || !inp.value.trim()) return;
+  var q = inp.value.trim(); inp.value = '';
+  var ans = agentAnswer(q);
+  var hist = document.getElementById('agent-history');
+  if (hist) {
+    hist.innerHTML += '<div style="text-align:left;margin:4px 0 2px;"><span style="background:#1e3347;border-radius:8px 8px 8px 2px;padding:5px 10px;font-size:12px;color:#94a3b8;display:inline-block;">' + q + '</span></div><div style="text-align:right;margin-bottom:6px;"><span style="background:rgba(240,180,41,0.1);border:1px solid rgba(240,180,41,0.2);border-radius:8px 8px 2px 8px;padding:5px 10px;font-size:12px;color:#f0b429;display:inline-block;">' + ans + '</span></div>';
+    hist.scrollTop = hist.scrollHeight;
+  }
+}
+
+function agentAnswer(q) {
+  var r = q.toLowerCase();
+  var orders = _agOrders(); var inv = _agInv(); var workers = _agWorkers(); var leads = _agLeads();
+  if (r.indexOf('הזמנ') >= 0) { var p=orders.filter(function(o){return o.status==='ממתין'||o.status==='בייצור';}); return '📦 ' + orders.length + ' הזמנות — ' + p.length + ' פתוחות.'; }
+  if (r.indexOf('מלאי') >= 0 || r.indexOf('סחורה') >= 0) { var lw=inv.filter(function(x){return x.status&&(x.status.indexOf('נמוך')>=0||x.status.indexOf('מחסור')>=0);}); return '🌾 ' + inv.length + ' פריטים' + (lw.length?' · ⚠️ '+lw.length+' בחוסר.':' · הכל ✅'); }
+  if (r.indexOf('עובד') >= 0) return '👷 ' + Object.keys(workers).length + ' עובדים רשומים.';
+  if (r.indexOf('ליד') >= 0 || r.indexOf('לקוח') >= 0) { var cv=leads.filter(function(l){return l.status==='הזמין';}); return '🎯 ' + leads.length + ' לידים · ' + cv.length + ' הזמינו (' + (leads.length?Math.round(cv.length/leads.length*100):0) + '%).'; }
+  if (r.indexOf('שלום') >= 0 || r.indexOf('היי') >= 0) return 'שלום! 🤖 שאל על: הזמנות / מלאי / עובדים / לידים';
+  if (r.indexOf('תודה') >= 0) return 'בשמחה! 😊';
+  if (r.indexOf('עזר') >= 0 || r.indexOf('מה אתה') >= 0) return '💡 אני קורא נתונים בזמן אמת מהמערכת. שאל על: הזמנות · מלאי · עובדים · לידים';
+  return '🤔 נסה: הזמנות / מלאי / עובדים / לידים';
+}
+
+function mktCopyLandingLink() {
+  var url = window.location.href.replace(/[^/]*$/, '') + 'marketing_landing.html';
+  var btn = document.getElementById('mkt-copy-link-btn');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      if (btn) { var o = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = o; }, 2000); }
+    });
+  } else {
+    var ta = document.createElement('textarea'); ta.value = url;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    if (btn) { var o2 = btn.textContent; btn.textContent = '✓ הועתק!'; setTimeout(function() { btn.textContent = o2; }, 2000); }
+  }
+}
+</script>
+
+<input type="date" id="global-date-picker" style="position:fixed;opacity:0;pointer-events:none;width:0;height:0;" onchange="jumpToDate(this.value)">
+
+<!-- ===== BULK IMPORT MODAL ===== -->
+<div id="bulk-import-overlay" onclick="if(event.target===this)closeBulkImport()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#1a2535;border:1px solid rgba(240,180,41,0.3);border-radius:18px;padding:28px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.7);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+      <div style="font-size:17px;font-weight:800;color:#f0b429;font-family:Heebo,Arial,sans-serif;">👥 ייבוא עובדים מרובה</div>
+      <button onclick="closeBulkImport()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;">×</button>
+    </div>
+    <div style="font-size:13px;color:#94a3b8;font-family:Heebo,Arial,sans-serif;margin-bottom:6px;line-height:1.6;">
+      הדבק שמות מ-Excel או רשום שם בכל שורה.<br>
+      <span style="color:#f0b429;">אפשר גם:</span> שם | שם משפחה | תפקיד | שכר/שעה | טלפון — מופרדים בטאב או פסיק
+    </div>
+    <div style="font-size:11px;color:#475569;font-family:Heebo,Arial,sans-serif;margin-bottom:12px;">
+      דוגמה: <span style="color:#60a5fa;">ישראל ישראלי | אופה | 45 | 0501234567</span>
+    </div>
+    <textarea id="bulk-import-txt" rows="12" placeholder="שם פרטי&#10;ישראל ישראלי&#10;מוחמד עלי | מחסנאי | 40&#10;..." style="width:100%;background:#0f1923;border:1px solid #2a3a50;border-radius:10px;padding:12px;color:white;font-family:Heebo,Arial,sans-serif;font-size:13px;direction:rtl;resize:vertical;outline:none;box-sizing:border-box;margin-bottom:12px;line-height:1.7;"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <div id="bulk-import-preview" style="font-size:12px;color:#64748b;font-family:Heebo,Arial,sans-serif;"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeBulkImport()" style="background:rgba(255,255,255,0.06);border:1px solid #2a3a50;color:#94a3b8;border-radius:8px;padding:9px 20px;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">ביטול</button>
+        <button onclick="runBulkImport()" style="background:linear-gradient(135deg,#f0b429,#d97706);color:#0a1628;border:none;border-radius:8px;padding:9px 24px;font-weight:800;font-size:13px;cursor:pointer;font-family:Heebo,Arial,sans-serif;">✓ ייבא עובדים</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DATA AGENT ===== -->
+<div id="agent-fab" onclick="toggleAgent()" title="סוכן נתונים" style="display:none;">🤖</div>
+<div id="agent-panel">
+  <div id="agent-panel-header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span>🤖 סוכן נתונים</span>
+      <span style="font-size:10px;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.5);color:#22c55e;border-radius:100px;padding:2px 8px;font-weight:700;">● חי</span>
+    </div>
+    <button onclick="toggleAgent()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer;line-height:1;padding:0 2px;">×</button>
+  </div>
+  <div id="agent-insights"></div>
+  <div id="agent-history"></div>
+  <div id="agent-input-row">
+    <input id="agent-input" type="text" placeholder="שאל שאלה על העסק..." onkeydown="if(event.key==='Enter')agentAsk()">
+    <button id="agent-send-btn" onclick="agentAsk()">שלח</button>
+  </div>
+</div>
+</body>
+</html>
